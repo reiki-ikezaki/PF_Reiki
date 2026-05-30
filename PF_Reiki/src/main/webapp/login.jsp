@@ -8,38 +8,43 @@
 
 <style>
     body {
-        font-family: Arial, sans-serif;
-        background: #f5f5f5;
-        margin: 0;
-        height: 100vh;
-    }
-
- 
-  	.login-btn {
-    		position: absolute;
-    		top: 10px;
-    		right: 10px;
-    		padding: 2px 6px;  
-    		font-size: 12px;    
-    		width: 80px;        
-    		background: #007bff;
-    		color: white;
-    		border: none;
-    		border-radius: 4px;
-	    cursor: pointer;
+    font-family: Arial, sans-serif;
+    background: #f5f5f5;
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;  
+    align-items: center;       
 }
 
-    .login-container {
-        display: none;
-        position: absolute;
-        top: 120px;
-        right: 20px;
-        background: white;
-        padding: 20px;
-        width: 300px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+.login-btn {
+    padding: 15px 30px;
+    font-size: 18px;
+    width: 220px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ★ 最初はフォームを隠す */
+.login-container {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    width: 300px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+    
+
+}
+
 
     .form-group {
         margin-bottom: 15px;
@@ -114,5 +119,7 @@
         ${errorMessage}
     </div>
 </div>
+
+
 </body>
 </html>
