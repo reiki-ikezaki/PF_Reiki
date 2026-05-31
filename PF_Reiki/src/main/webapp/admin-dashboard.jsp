@@ -5,62 +5,104 @@
 <head>
 <meta charset="UTF-8">
 <title>管理者ダッシュボード</title>
+
 <style>
     body {
         font-family: Arial, sans-serif;
         background: #f5f5f5;
         margin: 0;
-        padding: 20px;
-    }
-    .container {
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        width: 600px;
-        margin: auto;
-    }
-    h1 {
-        text-align: center;
-    }
-    ul {
-        list-style: none;
         padding: 0;
     }
-    li {
-        margin: 10px 0;
+
+    
+    .logout-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
     }
-    a {
-        text-decoration: none;
-        color: #007bff;
-        font-weight: bold;
+
+    .logout-btn button {
+        padding: 5px 10px;
+        font-size: 12px;
+        background: #aaa;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
     }
-    a:hover {
-        text-decoration: underline;
-    }
-    .logout {
-        margin-top: 30px;
+
+    .container {
+        width: 80%;
+        max-width: 900px;
+        margin: 80px auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
         text-align: center;
     }
+
+    h1 {
+        margin-bottom: 20px;
+    }
+
+    
+    .menu {
+        margin-top: 30px;
+    }
+
+    .menu a {
+        display: inline-block;
+        margin: 10px 20px;
+        padding: 10px 20px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+    }
+
+    .menu a:hover {
+        background: #0056b3;
+    }
+
+    
+    .likes-box {
+        margin-top: 30px;
+        padding: 20px;
+        background: #f0f0f0;
+        border-radius: 8px;
+        text-align: left;
+    }
+
 </style>
 </head>
 <body>
 
+
+<form action="LogoutServlet" method="post" class="logout-btn">
+    <button type="submit">ログアウト</button>
+</form>
+
 <div class="container">
     <h1>管理者ダッシュボード</h1>
-    <p>管理者ログイン成功しました。</p>
 
-    <ul>
-        <li><a href="LikeRankingServlet">いいねランキング</a></li>
-        <li><a href="AccountListServlet">アカウント一覧</a></li>
-        <li><a href="InquiryListServlet">お問い合わせ一覧</a></li>
-    </ul>
+    
+    <div class="likes-box">
+        <h2>いいね一覧</h2>
 
-    <div class="logout">
-        <form action="LogoutServlet" method="post">
-            <button type="submit">ログアウト</button>
-        </form>
+        //仮で定義中後でデータを取得するように変更
+        <ul>
+            <li>ユーザーA → 10いいね</li>
+            <li>ユーザーB → 7いいね</li>
+            <li>ユーザーC → 3いいね</li>
+        </ul>
     </div>
+
+    <div class="menu">
+        <a href="accountList">アカウント一覧</a>
+        <a href="contactList">お問い合わせ一覧</a>
+    </div>
+
 </div>
 
 </body>

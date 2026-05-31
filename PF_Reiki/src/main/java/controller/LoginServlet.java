@@ -42,7 +42,6 @@ public class LoginServlet extends HttpServlet {
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }
-
         
         
         if ("admin".equals(username) && "admin123".equals(password)) {

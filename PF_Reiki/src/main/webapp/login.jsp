@@ -28,7 +28,6 @@
     cursor: pointer;
 }
 
-/* ★ 最初はフォームを隠す */
 .login-container {
     display: none;
     position: absolute;
