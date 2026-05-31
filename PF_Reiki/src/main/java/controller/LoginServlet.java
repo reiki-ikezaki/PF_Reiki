@@ -45,13 +45,18 @@ public class LoginServlet extends HttpServlet {
         
         
         if ("admin".equals(username) && "admin123".equals(password)) {
+            request.getSession().setAttribute("username", username);
             response.sendRedirect("admin-dashboard.jsp");
+
         } else if ("user".equals(username) && "user1234".equals(password)) {
+            request.getSession().setAttribute("username", username);
             response.sendRedirect("user-dashboard.jsp");
+
         } else {
             request.setAttribute("errorMessage", "ユーザーネームまたはパスワードが違います");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
+
     }
 }
 
