@@ -99,9 +99,10 @@
     </div>
 
     <div class="menu">
-        <a href="accountList">アカウント一覧</a>
-        <a href="contactList">お問い合わせ一覧</a>
-    </div>
+    <a href="accountList">アカウント一覧</a>
+    <a href="contact-list.jsp">お問い合わせ一覧</a>
+</div>
+
 
 </div>
 
