@@ -79,7 +79,9 @@
 <body>
 
 <div class="sidebar">
-    <a href="#">プロフィール</a>
+    <!-- ★ プロフィール編集画面へ遷移 -->
+    <a href="profile-edit.jsp">プロフィール</a>
+
     <a href="#">タイムライン</a>
 </div>
 
