@@ -7,6 +7,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+import dao.UserDao;
+import model.UserData;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -15,48 +19,31 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        request.setCharacterEncoding("UTF-8");
+
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        
-        
-        if(username == null || username.isEmpty()) {
-        	request.setAttribute("errorMessage","ユーザーネームを入力してください");
-        	request.getRequestDispatcher("login.jsp").forward(request, response);
-        return;       
-        }
-        
-        if(username.length() > 255) {
-        	request.setAttribute("errorMessage","ユーザーネームは255文字以内で入力してください");
-        	request.getRequestDispatcher("login.jsp").forward(request, response);
-        	return;
-        }
-        
-        if(password == null || password.isEmpty()) {
-        	request.setAttribute("errorMessage","パスワードを入力してください");
-        	request.getRequestDispatcher("login.jsp").forward(request, response);
-        	return;
-        }
-        
-        if (!password.matches("^[a-zA-Z0-9_-]{8,32}$")) {
-            request.setAttribute("errorMessage", "パスワードは8〜32文字の半角英数字と _ - のみ使用できます");
-            request.getRequestDispatcher("login.jsp").forward(request, response);
-            return;
-        }
-        
-        
-        if ("admin".equals(username) && "admin123".equals(password)) {
-            request.getSession().setAttribute("username", username);
-            response.sendRedirect("admin-dashboard.jsp");
 
-        } else if ("user".equals(username) && "user1234".equals(password)) {
-            request.getSession().setAttribute("username", username);
-            response.sendRedirect("user-dashboard.jsp");
+        
+        UserDao dao = new UserDao();
+        UserData user = dao.findByLogin(username, password);
+
+        if (user != null) {
+            
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+
+            
+            if ("admin".equals(user.getRole())) {
+                response.sendRedirect("admin-dashboard.jsp");
+            } else {
+                response.sendRedirect("user-dashboard.jsp");
+            }
 
         } else {
+            
             request.setAttribute("errorMessage", "ユーザーネームまたはパスワードが違います");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }
-
     }
 }
-
