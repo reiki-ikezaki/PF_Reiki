@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
-<%@ page import="controller.AccountListServlet.User" %>
+<%@ page import="model.UserData" %>
 
 <!DOCTYPE html>
 <html>
@@ -59,21 +59,29 @@
         font-weight: bold;
     }
 
+    /* ★ 表を綺麗に整える完成版 CSS ★ */
     table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: collapse;   /* セルの隙間をなくす */
+        table-layout: fixed;         /* 各列を均等幅にする */
         margin-top: 20px;
     }
 
     table th, table td {
-        border: 1px solid #ccc;
-        padding: 10px;
+        border: 1px solid #999;      /* 枠線を濃くする */
+        padding: 12px;
         text-align: center;
+        word-wrap: break-word;       /* 長い文字を折り返す */
     }
 
     table th {
         background: #007bff;
         color: white;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background: #f2f2f2;         /* 偶数行に薄い色 */
     }
 
     .btn {
@@ -108,22 +116,22 @@
         <tr>
             <th>ユーザー名</th>
             <th>メールアドレス</th>
-            <th>作成日</th>
-            <th>更新日</th>
+            <th>名前</th>
+            <th>権限</th>
             <th>操作</th>
         </tr>
 
         <%
-            List<User> users = (List<User>) request.getAttribute("users");
+            List<UserData> users = (List<UserData>) request.getAttribute("users");
 
             if (users != null) {
-                for (User u : users) {
+                for (UserData u : users) {
         %>
         <tr>
-            <td><%= u.name %></td>
-            <td><%= u.email %></td>
-            <td><%= u.created %></td>
-            <td><%= u.updated %></td>
+            <td><%= u.getUsername() %></td>
+            <td><%= u.getEmail() %></td>
+            <td><%= u.getName() %></td>
+            <td><%= u.getRole() %></td>
             <td>
                 <a class="btn edit">編集</a>
                 <a class="btn ban">アクセス禁止</a>

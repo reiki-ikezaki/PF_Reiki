@@ -1,7 +1,6 @@
 package controller;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.servlet.ServletException;
@@ -10,6 +9,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import dao.UserDao;
+import model.UserData;
+
 @WebServlet("/accountList")
 public class AccountListServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -17,29 +19,11 @@ public class AccountListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ★ 仮データ（後で DB に変更）
-        List<User> users = new ArrayList<>();
-        users.add(new User("user1", "user1@example.com", "2025/05/25", "2025/06/16"));
-        users.add(new User("user2", "user2@example.com", "2025/05/25", "2025/06/16"));
-        users.add(new User("user3", "user3@example.com", "2025/05/25", "2025/06/16"));
+        UserDao dao = new UserDao();
+        List<UserData> users = dao.findAll();
 
         request.setAttribute("users", users);
 
         request.getRequestDispatcher("account-list.jsp").forward(request, response);
-    }
-
-    // ★ JSP に渡すための簡易 User クラス
-    public static class User {
-        public String name;
-        public String email;
-        public String created;
-        public String updated;
-
-        public User(String name, String email, String created, String updated) {
-            this.name = name;
-            this.email = email;
-            this.created = created;
-            this.updated = updated;
-        }
     }
 }

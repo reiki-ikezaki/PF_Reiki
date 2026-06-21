@@ -3,12 +3,14 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import model.UserData;
 
 public class UserDao {
 
-    
+    // ログイン用
     public UserData findByLogin(String username, String password) {
         UserData user = null;
 
@@ -37,15 +39,18 @@ public class UserDao {
 
         return user;
     }
-   
-    public boolean updateUser(UserData user) {
+
+    // ★ プロフィール更新
+    public boolean updateUser(int id, String email, String password, String name) {
         try (Connection conn = DBManager.getConnection()) {
 
-            String sql = "UPDATE users SET email = ?, name = ? WHERE id = ?";
+            String sql = "UPDATE users SET email = ?, password = ?, name = ? WHERE id = ?";
             PreparedStatement pStmt = conn.prepareStatement(sql);
-            pStmt.setString(1, user.getEmail());
-            pStmt.setString(2, user.getName());
-            pStmt.setInt(3, user.getId());
+
+            pStmt.setString(1, email);
+            pStmt.setString(2, password);
+            pStmt.setString(3, name);
+            pStmt.setInt(4, id);
 
             int result = pStmt.executeUpdate();
             return result == 1;
@@ -55,5 +60,34 @@ public class UserDao {
         }
 
         return false;
+    }
+
+    // ★ アカウント一覧（全ユーザー取得）
+    public List<UserData> findAll() {
+        List<UserData> list = new ArrayList<>();
+
+        try (Connection conn = DBManager.getConnection()) {
+
+            String sql = "SELECT * FROM users ORDER BY id";
+            PreparedStatement pStmt = conn.prepareStatement(sql);
+
+            ResultSet rs = pStmt.executeQuery();
+
+            while (rs.next()) {
+                UserData user = new UserData();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setName(rs.getString("name"));
+                user.setRole(rs.getString("role"));
+                list.add(user);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }
