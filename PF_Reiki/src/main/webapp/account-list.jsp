@@ -59,19 +59,19 @@
         font-weight: bold;
     }
 
-    /* ★ 表を綺麗に整える完成版 CSS ★ */
+
     table {
         width: 100%;
-        border-collapse: collapse;   /* セルの隙間をなくす */
-        table-layout: fixed;         /* 各列を均等幅にする */
+        border-collapse: collapse;  
+        table-layout: fixed;         
         margin-top: 20px;
     }
 
     table th, table td {
-        border: 1px solid #999;      /* 枠線を濃くする */
+        border: 1px solid #999;      
         padding: 12px;
         text-align: center;
-        word-wrap: break-word;       /* 長い文字を折り返す */
+        word-wrap: break-word;      
     }
 
     table th {
@@ -81,7 +81,7 @@
     }
 
     tr:nth-child(even) {
-        background: #f2f2f2;         /* 偶数行に薄い色 */
+        background: #f2f2f2;        
     }
 
     .btn {
