@@ -9,6 +9,9 @@ public class UserData {
     private String name;
     private String role;
 
+    // ★ ここに追加
+    private String status;
+
     public UserData() {}
 
     public int getId() {
@@ -51,5 +54,13 @@ public class UserData {
     }
     public void setRole(String role) {
         this.role = role;
+    }
+
+    
+    public String getStatus() {
+        return status;
+    }
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

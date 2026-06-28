@@ -71,8 +71,7 @@
         border: 1px solid #999;      
         padding: 12px;
         text-align: center;
-        word-wrap: break-word;      
-    }
+        word-wrap: break-word;       
 
     table th {
         background: #007bff;
@@ -81,7 +80,7 @@
     }
 
     tr:nth-child(even) {
-        background: #f2f2f2;        
+        background: #f2f2f2;         
     }
 
     .btn {
@@ -90,11 +89,16 @@
         text-decoration: none;
         color: white;
         font-size: 14px;
+        white-space: nowrap; 
+        margin-right: 6px;
     }
 
     .edit { background: #28a745; }
     .ban { background: #ff9800; }
     .delete { background: #dc3545; }
+    
+     td:last-child {
+        width: 280px;
 
 </style>
 </head>
@@ -118,7 +122,9 @@
             <th>メールアドレス</th>
             <th>名前</th>
             <th>権限</th>
+            <th>ステータス</th>
             <th>操作</th>
+            
         </tr>
 
         <%
@@ -132,10 +138,19 @@
             <td><%= u.getEmail() %></td>
             <td><%= u.getName() %></td>
             <td><%= u.getRole() %></td>
+            <td><%= u.getStatus() %></td>
+            
             <td>
-                <a class="btn edit">編集</a>
-                <a class="btn ban">アクセス禁止</a>
-                <a class="btn delete">削除</a>
+   
+        <a href="editUser?id=<%= u.getId() %>" class="btn edit">編集</a>
+
+        <% if ("active".equals(u.getStatus())) { %>
+            <a href="accountStatus?id=<%= u.getId() %>" class="btn ban">アクセス禁止</a>
+        <% } else { %>
+            <a href="accountStatus?id=<%= u.getId() %>" class="btn edit">アクセス許可</a>
+        <% } %>
+
+         <a class="btn delete">削除</a>
             </td>
         </tr>
         <%

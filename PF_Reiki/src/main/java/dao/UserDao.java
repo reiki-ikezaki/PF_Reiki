@@ -31,6 +31,7 @@ public class UserDao {
                 user.setPassword(rs.getString("password"));
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
+                user.setStatus(rs.getString("status")); // 
             }
 
         } catch (Exception e) {
@@ -81,6 +82,7 @@ public class UserDao {
                 user.setPassword(rs.getString("password"));
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
+                user.setStatus(rs.getString("status")); // ← これも必要
                 list.add(user);
             }
 
@@ -89,5 +91,24 @@ public class UserDao {
         }
 
         return list;
+    }
+
+   
+    public void toggleStatus(int userId) {
+        String sql = "UPDATE users "
+                   + "SET status = CASE "
+                   + "WHEN status = 'active' THEN 'banned' "
+                   + "ELSE 'active' END "
+                   + "WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
