@@ -24,16 +24,21 @@ public class LoginServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        
         UserDao dao = new UserDao();
         UserData user = dao.findByLogin(username, password);
 
         if (user != null) {
+
             
+            if ("deleted".equals(user.getStatus())) {
+                request.setAttribute("errorMessage", "このアカウントは削除されています。");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
+            }
+
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
 
-            
             if ("admin".equals(user.getRole())) {
                 response.sendRedirect("admin-dashboard.jsp");
             } else {
@@ -41,7 +46,6 @@ public class LoginServlet extends HttpServlet {
             }
 
         } else {
-            
             request.setAttribute("errorMessage", "ユーザーネームまたはパスワードが違います");
             request.getRequestDispatcher("login.jsp").forward(request, response);
         }

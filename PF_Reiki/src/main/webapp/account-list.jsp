@@ -150,7 +150,8 @@
             <a href="accountStatus?id=<%= u.getId() %>" class="btn edit">アクセス許可</a>
         <% } %>
 
-         <a class="btn delete">削除</a>
+        <a href="deleteUser?id=<%= u.getId() %>" class="btn delete">削除</a>
+
             </td>
         </tr>
         <%

@@ -10,7 +10,7 @@ import model.UserData;
 
 public class UserDao {
 
-    // ログイン用
+    
     public UserData findByLogin(String username, String password) {
         UserData user = null;
 
@@ -31,7 +31,7 @@ public class UserDao {
                 user.setPassword(rs.getString("password"));
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
-                user.setStatus(rs.getString("status")); // 
+                user.setStatus(rs.getString("status"));
             }
 
         } catch (Exception e) {
@@ -63,13 +63,13 @@ public class UserDao {
         return false;
     }
 
-    // ★ アカウント一覧（全ユーザー取得）
+    // ★ アカウント一覧（論理削除されたユーザーを除外）
     public List<UserData> findAll() {
         List<UserData> list = new ArrayList<>();
 
         try (Connection conn = DBManager.getConnection()) {
 
-            String sql = "SELECT * FROM users ORDER BY id";
+            String sql = "SELECT * FROM users WHERE status != 'deleted' ORDER BY id";
             PreparedStatement pStmt = conn.prepareStatement(sql);
 
             ResultSet rs = pStmt.executeQuery();
@@ -82,7 +82,7 @@ public class UserDao {
                 user.setPassword(rs.getString("password"));
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
-                user.setStatus(rs.getString("status")); // ← これも必要
+                user.setStatus(rs.getString("status"));
                 list.add(user);
             }
 
@@ -93,7 +93,7 @@ public class UserDao {
         return list;
     }
 
-   
+    // ★ ステータス切り替え（active ↔ banned）
     public void toggleStatus(int userId) {
         String sql = "UPDATE users "
                    + "SET status = CASE "
@@ -105,6 +105,21 @@ public class UserDao {
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, userId);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    
+    public void logicalDelete(int id) {
+        String sql = "UPDATE users SET status = 'deleted' WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
 
         } catch (Exception e) {
