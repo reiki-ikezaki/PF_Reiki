@@ -72,6 +72,7 @@
         padding: 12px;
         text-align: center;
         word-wrap: break-word;       
+}
 
     table th {
         background: #007bff;
@@ -99,6 +100,8 @@
     
      td:last-child {
         width: 280px;
+        }
+        
 
 </style>
 </head>
@@ -160,6 +163,41 @@
         %>
 
     </table>
+    <!-- ▼▼▼ ページネーション ▼▼▼ -->
+<div class="pagination" style="text-align:center; margin-top:20px;">
+
+    <% 
+        int currentPage = (int) request.getAttribute("page");
+        int totalPages = (int) request.getAttribute("totalPages");
+    %>
+
+    <!-- 前へ -->
+    <% if (currentPage > 1) { %>
+        <a href="accountList?page=<%= currentPage - 1 %>">前へ</a>
+    <% } else { %>
+        <span style="color:#ccc;">前へ</span>
+    <% } %>
+
+    <!-- ページ番号 -->
+    <% for (int i = 1; i <= totalPages; i++) { %>
+        <% if (i == currentPage) { %>
+            <strong>[<%= i %>]</strong>
+        <% } else { %>
+            <a href="accountList?page=<%= i %>">[<%= i %>]</a>
+        <% } %>
+    <% } %>
+
+    <!-- 次へ -->
+    <% if (currentPage < totalPages) { %>
+        <a href="accountList?page=<%= currentPage + 1 %>">次へ</a>
+    <% } else { %>
+        <span style="color:#ccc;">次へ</span>
+    <% } %>
+
+</div>
+<!-- ▲▲▲ ページネーション ▲▲▲ -->
+
+    
 </div>
 
 </body>

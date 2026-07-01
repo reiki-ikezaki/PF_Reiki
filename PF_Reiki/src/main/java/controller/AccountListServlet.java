@@ -19,10 +19,35 @@ public class AccountListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        UserDao dao = new UserDao();
-        List<UserData> users = dao.findAll();
+        
+        int page = 1;      
+        int limit = 5;     
+        
+        String pageStr = request.getParameter("page");
+        if (pageStr != null) {
+            try {
+                page = Integer.parseInt(pageStr);
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
 
+        int offset = (page - 1) * limit;
+        UserDao dao = new UserDao();
+
+        
+        List<UserData> users = dao.findPage(offset, limit);
+
+        
+        int totalUsers = dao.countUsers();
+
+       
+        int totalPages = (int) Math.ceil((double) totalUsers / limit);
+
+        
         request.setAttribute("users", users);
+        request.setAttribute("page", page);
+        request.setAttribute("totalPages", totalPages);
 
         request.getRequestDispatcher("account-list.jsp").forward(request, response);
     }

@@ -128,6 +128,7 @@ public class UserDao {
 
     // ★ 1件取得（編集画面用）← 正しい位置はここ！
     public UserData findById(int id) {
+    	
         UserData user = null;
 
         String sql = "SELECT * FROM users WHERE id = ?";
@@ -148,11 +149,64 @@ public class UserDao {
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
             }
+            
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return user;
+    }
+ // ★ ページネーション：5件だけ取得
+    public List<UserData> findPage(int offset, int limit) {
+        List<UserData> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM users WHERE status != 'deleted' ORDER BY id LIMIT ? OFFSET ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, limit);   // 5件
+            pstmt.setInt(2, offset);  // 0, 5, 10, 15...
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                UserData user = new UserData();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setName(rs.getString("name"));
+                user.setRole(rs.getString("role"));
+                user.setStatus(rs.getString("status"));
+                list.add(user);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        return user;
+        return list;
     }
+ // ★ ページネーション：総件数を数える
+    public int countUsers() {
+        int count = 0;
+
+        String sql = "SELECT COUNT(*) FROM users WHERE status != 'deleted'";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
 }
