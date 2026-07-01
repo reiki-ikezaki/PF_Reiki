@@ -33,7 +33,7 @@ public class LoginServlet extends HttpServlet {
             if ("deleted".equals(user.getStatus())) {
                 request.setAttribute("errorMessage", "このアカウントは削除されています。");
                 request.getRequestDispatcher("login.jsp").forward(request, response);
-                return;
+                return; 
             }
 
             HttpSession session = request.getSession();
