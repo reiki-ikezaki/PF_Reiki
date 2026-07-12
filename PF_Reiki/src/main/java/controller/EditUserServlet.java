@@ -18,7 +18,6 @@ public class EditUserServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // accountList.jsp の編集ボタンから id を受け取る
         String idStr = request.getParameter("id");
 
         if (idStr != null) {
@@ -28,11 +27,11 @@ public class EditUserServlet extends HttpServlet {
             UserDao dao = new UserDao();
             UserData user = dao.findById(userId);
 
-            // JSP に渡す
+            
             request.setAttribute("user", user);
         }
 
-        // 編集画面へ遷移
-        request.getRequestDispatcher("editUser.jsp").forward(request, response);
+        
+        request.getRequestDispatcher("edit-account.jsp").forward(request, response);
     }
 }
