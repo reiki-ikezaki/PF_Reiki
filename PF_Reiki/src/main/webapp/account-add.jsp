@@ -7,54 +7,109 @@
 <title>アカウント追加</title>
 
 <style>
-    
-    .vertical label {
-        display: block;
-        margin-bottom: 10px;
-        font-weight: bold;
+    .vertical {
+        margin-bottom: 20px;
+    }
+
+    .radio-group {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin-top: 6px;
+    }
+
+    .vertical input, .vertical select, .vertical textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 12px;
     }
 </style>
+
+<script>
+function toggleRole() {
+    const role = document.querySelector('input[name="role"]:checked').value;
+
+    if (role === "admin") {
+        document.getElementById("adminFields").style.display = "block";
+        document.getElementById("userFields").style.display = "none";
+    } else {
+        document.getElementById("adminFields").style.display = "none";
+        document.getElementById("userFields").style.display = "block";
+    }
+}
+</script>
 
 </head>
 <body>
 
-<!-- ▼ ユーザー種別（縦並び） ▼ -->
-<div class="vertical">
-    <label>
-        <input type="radio" name="role" value="user" checked> 一般
-    </label>
-    <label>
-        <input type="radio" name="role" value="admin"> 管理者
-    </label>
-</div>
+<h1>アカウント追加</h1>
 
+<!-- ★★★ ここからフォーム ★★★ -->
+<form action="CreateUserServlet" method="post" enctype="multipart/form-data">
 
-<div class="vertical">
-    <label>名前</label>
-    <input type="text" name="name">
-</div>
+    <!-- ▼ ユーザー種別 -->
+    <div class="vertical">
+        <label>ユーザー種別</label>
+        <div class="radio-group">
+            <label><input type="radio" name="role" value="user" checked onclick="toggleRole()"> 一般ユーザー</label>
+            <label><input type="radio" name="role" value="admin" onclick="toggleRole()"> 管理者</label>
+        </div>
+    </div>
 
+    <!-- ▼ ステータス -->
+    <div class="vertical">
+        <label>ステータス</label>
+        <div class="radio-group">
+            <label><input type="radio" name="status" value="active" checked> 有効</label>
+            <label><input type="radio" name="status" value="banned"> アクセス禁止</label>
+        </div>
+    </div>
 
-<div class="vertical">
-    <label>メールアドレス</label>
-    <input type="email" name="email">
-</div>
+    <!-- ▼ 一般ユーザー項目 -->
+    <div id="userFields" class="vertical">
 
-<div class="vertical">
-    <label>パスワード</label>
-    <input type="password" name="password">
-</div>
+        <label>ユーザー名</label>
+        <input type="text" name="username">
+
+        <label>メールアドレス</label>
+        <input type="email" name="email">
+
+        <label>ふりがな</label>
+        <input type="text" name="furigana">
+
+        <label>性別</label>
+        <select name="gender">
+            <option value="male">男性</option>
+            <option value="female">女性</option>
+            <option value="other">その他</option>
+        </select>
+
+        <label>年齢</label>
+        <input type="number" name="age">
+
+        <label>自己紹介</label>
+        <textarea name="bio" rows="4"></textarea>
+
+        <label>プロフィール画像</label>
+        <input type="file" name="profileImage">
+
+    </div>
+
+    <!-- ▼ 管理者項目 -->
+    <div id="adminFields" class="vertical" style="display:none;">
+
+        <label>ユーザー名</label>
+        <input type="text" name="username">
+
+        <label>メールアドレス</label>
+        <input type="email" name="email">
+
+    </div>
+
+    <button type="submit">登録</button>
+
+</form>
+<!-- ★★★ フォームここまで ★★★ -->
 
 </body>
-
-<div class="vertical">
-    <label>ステータス</label>
-    <label>
-        <input type="radio" name="status" value="active" checked> アクセス許可
-    </label>
-    <label>
-        <input type="radio" name="status" value="banned"> アクセス禁止
-    </label>
-</div>
-
 </html>

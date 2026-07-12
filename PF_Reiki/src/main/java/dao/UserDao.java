@@ -31,6 +31,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
+                user.setProfileImage(rs.getString("profile_image")); // ★追加
             }
 
         } catch (Exception e) {
@@ -82,6 +83,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
+                user.setProfileImage(rs.getString("profile_image")); 
                 list.add(user);
             }
 
@@ -126,9 +128,8 @@ public class UserDao {
         }
     }
 
-    // ★ 1件取得（編集画面用）← 正しい位置はここ！
+    // ★ 1件取得（編集画面用）
     public UserData findById(int id) {
-    	
         UserData user = null;
 
         String sql = "SELECT * FROM users WHERE id = ?";
@@ -148,15 +149,16 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
+                user.setProfileImage(rs.getString("profile_image")); 
             }
-            
 
         } catch (Exception e) {
             e.printStackTrace();
         }
         return user;
     }
- // ★ ページネーション：5件だけ取得
+
+    // ★ ページネーション：5件だけ取得
     public List<UserData> findPage(int offset, int limit) {
         List<UserData> list = new ArrayList<>();
 
@@ -165,8 +167,8 @@ public class UserDao {
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, limit);   // 5件
-            pstmt.setInt(2, offset);  // 0, 5, 10, 15...
+            pstmt.setInt(1, limit);
+            pstmt.setInt(2, offset);
 
             ResultSet rs = pstmt.executeQuery();
 
@@ -179,6 +181,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
+                user.setProfileImage(rs.getString("profile_image")); 
                 list.add(user);
             }
 
@@ -188,7 +191,8 @@ public class UserDao {
 
         return list;
     }
- // ★ ページネーション：総件数を数える
+
+    // ★ ページネーション：総件数
     public int countUsers() {
         int count = 0;
 
@@ -209,4 +213,33 @@ public class UserDao {
         return count;
     }
 
+    // ★ 新規ユーザー追加（一般／管理者共通）
+    public boolean insertUser(UserData user) {
+
+        String sql = "INSERT INTO users "
+                + "(username, email, role, status, furigana, gender, age, bio, profile_image) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getEmail());
+            pstmt.setString(3, user.getRole());
+            pstmt.setString(4, user.getStatus());
+            pstmt.setString(5, user.getFurigana());
+            pstmt.setString(6, user.getGender());
+            pstmt.setString(7, user.getAge());
+            pstmt.setString(8, user.getBio());
+            pstmt.setString(9, user.getProfileImage());
+
+            int result = pstmt.executeUpdate();
+            return result == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
