@@ -287,5 +287,20 @@ public class UserDao {
             e.printStackTrace();
         }
     }
+ // ★ 復活（deleted → active）
+    public void restoreAccount(int id) {
+        String sql = "UPDATE users SET status = 'active' WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
 }

@@ -110,7 +110,7 @@
             </td>
 
             <td>
-                <a href="restoreUser?id=<%= u.getId() %>" class="btn restore">復活</a>
+                <a href="restoreAccount?id=<%= u.getId() %>" class="btn restore">復活</a>
             </td>
         </tr>
         <%
@@ -125,3 +125,4 @@
 </div>
 
 </body>
+</html>
