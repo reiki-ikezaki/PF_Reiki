@@ -31,7 +31,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image")); // ★追加
+                user.setProfileImage(rs.getString("profile_image"));
             }
 
         } catch (Exception e) {
@@ -83,7 +83,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image")); 
+                user.setProfileImage(rs.getString("profile_image"));
                 list.add(user);
             }
 
@@ -149,7 +149,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image")); 
+                user.setProfileImage(rs.getString("profile_image"));
             }
 
         } catch (Exception e) {
@@ -181,7 +181,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image")); 
+                user.setProfileImage(rs.getString("profile_image"));
                 list.add(user);
             }
 
@@ -242,4 +242,50 @@ public class UserDao {
 
         return false;
     }
+
+    // ★ 削除済みユーザー一覧を取得
+    public List<UserData> findDeletedUsers() {
+        List<UserData> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM users WHERE status = 'deleted' ORDER BY id";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                UserData user = new UserData();
+                user.setId(rs.getInt("id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setPassword(rs.getString("password"));
+                user.setName(rs.getString("name"));
+                user.setRole(rs.getString("role"));
+                user.setStatus(rs.getString("status"));
+                user.setProfileImage(rs.getString("profile_image"));
+                list.add(user);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // ★ 完全削除（物理削除）
+    public void deleteUserPermanent(int id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 }
