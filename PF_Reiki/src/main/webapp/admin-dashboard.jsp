@@ -100,7 +100,7 @@
 
     <div class="menu">
     <a href="accountList">アカウント一覧</a>
-    <a href="contact-list.jsp">お問い合わせ一覧</a>
+    <a href="contact_list.jsp">お問い合わせ一覧</a>
     <a href="deleteAccountList">削除済みアカウント一覧</a>
 </div>
 
