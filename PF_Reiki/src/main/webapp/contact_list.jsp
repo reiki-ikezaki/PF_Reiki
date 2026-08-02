@@ -115,6 +115,7 @@
             <td><%= ing.getCreatedAt() %></td>
             <td><%= ing.getUpdatedAt() %></td>
             <td>
+                
                 <a class="btn" href="contact_detail?id=<%= ing.getId() %>">詳細</a>
                 <a class="btn btn-delete" href="contact_delete?id=<%= ing.getId() %>">削除</a>
             </td>
