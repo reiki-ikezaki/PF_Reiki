@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,26 +9,20 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet("/contactList")
-public class ContactListServlet extends HttpServlet {
-    private static final long serialVersionUID = 1L;
+import dao.InquiryDao;
+import model.InquiryData;
 
-   
+@WebServlet("/contact_list")
+public class ContactListServlet extends HttpServlet {
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("contact-list.jsp").forward(request, response);
-    }
+        InquiryDao dao = new InquiryDao();
+        List<InquiryData> list = dao.findAll();
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+        request.setAttribute("inquiryList", list);
 
-      
-        String message = request.getParameter("message");
-
-     
-        request.setAttribute("message", message);
-
-        request.getRequestDispatcher("contact-list.jsp").forward(request, response);
+        request.getRequestDispatcher("contact_list.jsp").forward(request, response);
     }
 }
