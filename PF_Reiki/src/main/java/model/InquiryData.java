@@ -3,9 +3,11 @@ package model;
 public class InquiryData {
 
     private int id;
+    private int categoryId;        // ★ JOIN用に追加（必要）
     private String categoryName;
     private String email;
     private String content;
+    private String shortContent;   // ★ 一覧用の短縮本文（追加）
     private String status;
     private String createdAt;
     private String updatedAt;
@@ -27,6 +29,10 @@ public class InquiryData {
         return id;
     }
 
+    public int getCategoryId() {
+        return categoryId;
+    }
+
     public String getCategoryName() {
         return categoryName;
     }
@@ -37,6 +43,10 @@ public class InquiryData {
 
     public String getContent() {
         return content;
+    }
+
+    public String getShortContent() {
+        return shortContent;
     }
 
     public String getStatus() {
@@ -55,6 +65,11 @@ public class InquiryData {
         this.id = id;
     }
 
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    // ★ String に修正（元は int で誤り）
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
@@ -65,6 +80,10 @@ public class InquiryData {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setShortContent(String shortContent) {
+        this.shortContent = shortContent;
     }
 
     public void setStatus(String status) {

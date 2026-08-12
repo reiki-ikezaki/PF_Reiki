@@ -8,42 +8,28 @@
 
 <style>
     body {
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    margin: 0;
-    height: 100vh;
-    display: flex;
-    justify-content: center;  
-    align-items: center;       
-}
+        font-family: Arial, sans-serif;
+        background: #f5f5f5;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;   
+        justify-content: center;  
+        align-items: center;       
+    }
 
-.login-btn {
-    padding: 15px 30px;
-    font-size: 18px;
-    width: 220px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-}
-
-.login-container {
-    display: none;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    width: 300px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-    
-
-}
-
+    .login-container {
+        display: block;   
+        position: fixed;          
+        top: 20%;               
+        left: 50%;
+        transform: translate(-50%, 0);
+        background: white;
+        padding: 20px;
+        width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
 
     .form-group {
         margin-bottom: 15px;
@@ -84,41 +70,30 @@
     }
 </style>
 
-<script>
-    function toggleLogin() {
-        const box = document.getElementById("loginBox");
-        box.style.display = (box.style.display === "block") ? "none" : "block";
-    }
-</script>
-
 </head>
 <body>
 
-
-<button class="login-btn" onclick="toggleLogin()">ログイン</button>
-
 <div id="loginBox" class="login-container">
-    <form action="login" method="post">
+    <form action="/PF_Reiki/login" method="post">
+
+    
         <div class="form-group">
             <label>ユーザーネーム</label>
-            <input type="text" name="username">
+            <input type="text" name="username" required>
         </div>
 
         <div class="form-group">
             <label>パスワード</label>
-            <input type="password" name="password">
+            <input type="password" name="password" required>
         </div>
 
         <button type="submit">ログイン</button>
     </form>
 
-    <button class="close-btn" onclick="toggleLogin()">閉じる</button>
-
     <div class="error">
         ${errorMessage}
     </div>
 </div>
-
 
 </body>
 </html>

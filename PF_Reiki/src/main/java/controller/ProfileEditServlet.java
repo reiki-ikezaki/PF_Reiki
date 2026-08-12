@@ -25,39 +25,36 @@ public class ProfileEditServlet extends HttpServlet {
         String password = request.getParameter("password");
         String name = request.getParameter("name");
 
-        // ★ ログイン中のユーザー取得
+        
         HttpSession session = request.getSession();
         UserData user = (UserData) session.getAttribute("user");
 
-        // ★ メールチェック
+    
         if (!isValidEmail(email)) {
             request.setAttribute("error", "メールアドレスの形式が不正、または255文字を超えています。");
             forward(request, response);
             return;
         }
 
-        // ★ パスワード空欄 → エラー（アリアの仕様）
+        
         if (password == null || password.isEmpty()) {
             request.setAttribute("error", "パスワードを入力してください。");
             forward(request, response);
             return;
         }
 
-        // ★ パスワード形式チェック
         if (!isValidPassword(password)) {
             request.setAttribute("error", "パスワードは8〜32文字の半角英数字と _ - のみ使用できます。");
             forward(request, response);
             return;
         }
 
-        // ★ 名前チェック
         if (!isValidName(name)) {
             request.setAttribute("error", "名前は255文字以内で入力してください。");
             forward(request, response);
             return;
         }
 
-        // ★ DB 更新
         UserDao dao = new UserDao();
         boolean updated = dao.updateUser(user.getId(), email, password, name);
 
@@ -67,13 +64,11 @@ public class ProfileEditServlet extends HttpServlet {
             return;
         }
 
-        // ★ セッション更新
         user.setEmail(email);
         user.setPassword(password);
         user.setName(name);
         session.setAttribute("user", user);
 
-        // ★ 成功メッセージ
         request.setAttribute("success", "プロフィールを更新しました！");
         forward(request, response);
     }

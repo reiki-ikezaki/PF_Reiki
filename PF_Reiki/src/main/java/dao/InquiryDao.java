@@ -6,13 +6,10 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import dao.DBManager;
-
 import model.InquiryData;
 
 public class InquiryDao {
 
-    // ★ お問い合わせ一覧（カテゴリ JOIN 版）
     public List<InquiryData> findAll() {
         List<InquiryData> list = new ArrayList<>();
 
@@ -31,15 +28,18 @@ public class InquiryDao {
 
                 inq.setId(rs.getInt("id"));
                 inq.setCategoryId(rs.getInt("category_id"));
+                inq.setCategoryName(rs.getString("category_name"));
+                inq.setEmail(rs.getString("email"));
                 inq.setContent(rs.getString("content"));
                 inq.setStatus(rs.getString("status"));
+                inq.setCreatedAt(rs.getString("created_at"));
+                inq.setUpdatedAt(rs.getString("updated_at"));
 
-                // 本文10文字だけ shortContent に入れる
                 String content = rs.getString("content");
-                inq.setShortContent(content.length() > 10 ? content.substring(0, 10) : content);
-
-                // ★ JOIN で取得したカテゴリ名
-                inq.setCategoryName(rs.getString("category_name"));
+                String shortContent = (content.length() > 10)
+                        ? content.substring(0, 10)
+                        : content;
+                inq.setShortContent(shortContent);
 
                 list.add(inq);
             }
@@ -51,7 +51,6 @@ public class InquiryDao {
         return list;
     }
 
-    // ★ お問い合わせ詳細（カテゴリ JOIN 版）
     public InquiryData findById(int id) {
         InquiryData data = null;
 
@@ -72,11 +71,12 @@ public class InquiryDao {
 
                 data.setId(rs.getInt("id"));
                 data.setCategoryId(rs.getInt("category_id"));
+                data.setCategoryName(rs.getString("category_name"));
+                data.setEmail(rs.getString("email"));
                 data.setContent(rs.getString("content"));
                 data.setStatus(rs.getString("status"));
-
-                // ★ JOIN で取得したカテゴリ名
-                data.setCategoryName(rs.getString("category_name"));
+                data.setCreatedAt(rs.getString("created_at"));
+                data.setUpdatedAt(rs.getString("updated_at"));
             }
 
         } catch (Exception e) {
@@ -85,8 +85,7 @@ public class InquiryDao {
 
         return data;
     }
-    
-    // ★ ステータス更新（未対応 → 対応中 → 対応済み）
+
     public void updateStatus(int id, String status) {
         String sql = "UPDATE inquiries SET status = ? WHERE id = ?";
 
@@ -102,4 +101,21 @@ public class InquiryDao {
         }
     }
 
+    public void insertInquiry(int categoryId, String content, String email) {
+        String sql =
+            "INSERT INTO inquiries (category_id, content, email, status) " +
+            "VALUES (?, ?, ?, '未対応')";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, categoryId);
+            pstmt.setString(2, content);
+            pstmt.setString(3, email);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
