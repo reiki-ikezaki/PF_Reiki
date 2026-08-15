@@ -9,10 +9,11 @@ public class DBManager {
         "jdbc:mysql://localhost:3306/myapp_db?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Tokyo";
 
     private static final String USER = "root";        
-    private static final String PASS = "";            
+    private static final String PASS = "root";            
 
     public static Connection getConnection() {
         try {
+        	Class.forName("com.mysql.cj.jdbc.Driver");
             return DriverManager.getConnection(URL, USER, PASS);
         } catch (Exception e) {
             e.printStackTrace();

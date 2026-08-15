@@ -11,16 +11,28 @@ import model.UserData;
 public class UserDao {
 
     public UserData findByLogin(String username, String password) {
+    	
+    	System.out.println("【findByLogin 開始】");
+        System.out.println("受け取った username = " + username);
+        System.out.println("受け取った password = " + password);
+        
         UserData user = null;
 
         try (Connection conn = DBManager.getConnection()) {
+        	
+        	System.out.println("DB接続成功: " + conn);
 
             String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
             PreparedStatement pStmt = conn.prepareStatement(sql);
+            
+            System.out.println("SQL = " + sql);
+            
             pStmt.setString(1, username);
             pStmt.setString(2, password);
 
             ResultSet rs = pStmt.executeQuery();
+            System.out.println("SQL実行完了");
+            
 
             if (rs.next()) {
                 user = new UserData();
@@ -41,7 +53,6 @@ public class UserDao {
         return user;
     }
 
-    // ★ プロフィール更新
     public boolean updateUser(int id, String email, String password, String name) {
         try (Connection conn = DBManager.getConnection()) {
 
@@ -63,7 +74,6 @@ public class UserDao {
         return false;
     }
 
-    // ★ アカウント一覧（論理削除されたユーザーを除外）
     public List<UserData> findAll() {
         List<UserData> list = new ArrayList<>();
 
@@ -94,7 +104,6 @@ public class UserDao {
         return list;
     }
 
-    // ★ ステータス切り替え（active ↔ banned）
     public void toggleStatus(int userId) {
         String sql = "UPDATE users "
                    + "SET status = CASE "
@@ -113,7 +122,6 @@ public class UserDao {
         }
     }
 
-    // ★ 論理削除
     public void logicalDelete(int id) {
         String sql = "UPDATE users SET status = 'deleted' WHERE id = ?";
 
@@ -128,7 +136,6 @@ public class UserDao {
         }
     }
 
-    // ★ 1件取得（編集画面用）
     public UserData findById(int id) {
         UserData user = null;
 
@@ -158,7 +165,6 @@ public class UserDao {
         return user;
     }
 
-    // ★ ページネーション：5件だけ取得
     public List<UserData> findPage(int offset, int limit) {
         List<UserData> list = new ArrayList<>();
 
@@ -192,7 +198,6 @@ public class UserDao {
         return list;
     }
 
-    // ★ ページネーション：総件数
     public int countUsers() {
         int count = 0;
 
@@ -213,7 +218,6 @@ public class UserDao {
         return count;
     }
 
-    // ★ 新規ユーザー追加（一般／管理者共通）
     public boolean insertUser(UserData user) {
 
         String sql = "INSERT INTO users "
@@ -243,7 +247,6 @@ public class UserDao {
         return false;
     }
 
-    // ★ 削除済みユーザー一覧を取得
     public List<UserData> findDeletedUsers() {
         List<UserData> list = new ArrayList<>();
 
@@ -273,7 +276,6 @@ public class UserDao {
         return list;
     }
 
-    // ★ 完全削除（物理削除）
     public void deleteUserPermanent(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
 
@@ -287,7 +289,6 @@ public class UserDao {
             e.printStackTrace();
         }
     }
- // ★ 復活（deleted → active）
     public void restoreAccount(int id) {
         String sql = "UPDATE users SET status = 'active' WHERE id = ?";
 

@@ -25,12 +25,19 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
 
         request.setCharacterEncoding("UTF-8");
+        
+        System.out.println("開始");
 
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
+        System.out.println("入力された username = " + username);
+        System.out.println("入力された password = " + password);
+        
         UserDao dao = new UserDao();
         UserData user = dao.findByLogin(username, password);
+        
+        System.out.println("findByLogin の結果 user = " + user);
 
         if (user != null) {
 

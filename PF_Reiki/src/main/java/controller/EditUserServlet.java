@@ -23,7 +23,6 @@ public class EditUserServlet extends HttpServlet {
         if (idStr != null) {
             int userId = Integer.parseInt(idStr);
 
-            // DB からユーザー情報を1件取得
             UserDao dao = new UserDao();
             UserData user = dao.findById(userId);
 
