@@ -1,12 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="model.InquiryData" %>
+<%@ page import="model.Category" %>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>お問い合わせ一覧</title>
+<title>カテゴリ一覧</title>
 
 <style>
     body {
@@ -81,42 +81,33 @@
 
 <div class="header">
     <a class="back-btn" href="admin-dashboard.jsp">戻る</a>
-    <span>お問い合わせ一覧</span>
+    <span>カテゴリ一覧</span>
     <a class="logout" href="logout">ログアウト</a>
 </div>
 
 <div class="main">
 
-    <!-- ▼ 追加したカテゴリ一覧ボタン -->
-    <a class="btn" href="categoryList">カテゴリ一覧</a>
+    <a class="btn" href="categoryAdd">カテゴリ追加</a>
     <br><br>
 
     <table>
         <tr>
-            <th>カテゴリ</th>
-            <th>メールアドレス</th>
-            <th>お問い合わせ内容</th>
-            <th>ステータス</th>
-            <th>送信日</th>
-            <th>更新日</th>
+            <th>ID</th>
+            <th>カテゴリ名</th>
             <th>操作</th>
         </tr>
 
         <%
-            List<InquiryData> list = (List<InquiryData>) request.getAttribute("inquiryList");
+            List<Category> list = (List<Category>) request.getAttribute("categoryList");
             if (list != null) {
-                for (InquiryData ing : list) {
+                for (Category cat : list) {
         %>
         <tr>
-            <td><%= ing.getCategoryName() %></td>
-            <td><%= ing.getEmail() %></td>
-            <td><%= ing.getContent() %></td>
-            <td><%= ing.getStatus() %></td>
-            <td><%= ing.getCreatedAt() %></td>
-            <td><%= ing.getUpdatedAt() %></td>
+            <td><%= cat.getId() %></td>
+            <td><%= cat.getName() %></td>
             <td>
-                <a class="btn" href="contact_detail?id=<%= ing.getId() %>">詳細</a>
-                <a class="btn btn-delete" href="contact_delete?id=<%= ing.getId() %>">削除</a>
+                <a class="btn" href="categoryEdit?id=<%= cat.getId() %>">編集</a>
+                <a class="btn btn-delete" href="categoryDelete?id=<%= cat.getId() %>">削除</a>
             </td>
         </tr>
         <%

@@ -93,7 +93,35 @@
     <div class="error">
         ${errorMessage}
     </div>
+    </div>
+
 </div>
+
 
 </body>
 </html>
+<div id="loginBox" class="login-container">
+    <form action="/PF_Reiki/login" method="post">
+
+        <div class="form-group">
+            <label>ユーザーネーム</label>
+            <input type="text" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label>パスワード</label>
+            <input type="password" name="password" required>
+        </div>
+
+        <button type="submit">ログイン</button>
+    </form>
+
+    <div class="error">
+        ${errorMessage}
+    </div>
+
+    <!-- ★ここに移動する！ -->
+    <br>
+    <a href="contact.jsp">お問い合わせはこちら</a>
+    
+</div>
