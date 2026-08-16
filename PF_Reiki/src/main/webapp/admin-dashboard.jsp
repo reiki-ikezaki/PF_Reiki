@@ -14,7 +14,6 @@
         padding: 0;
     }
 
-    
     .logout-btn {
         position: absolute;
         top: 10px;
@@ -46,7 +45,6 @@
         margin-bottom: 20px;
     }
 
-    
     .menu {
         margin-top: 30px;
     }
@@ -65,7 +63,6 @@
         background: #0056b3;
     }
 
-    
     .likes-box {
         margin-top: 30px;
         padding: 20px;
@@ -73,11 +70,9 @@
         border-radius: 8px;
         text-align: left;
     }
-
 </style>
 </head>
 <body>
-
 
 <form action="LogoutServlet" method="post" class="logout-btn">
     <button type="submit">ログアウト</button>
@@ -86,11 +81,8 @@
 <div class="container">
     <h1>管理者ダッシュボード</h1>
 
-    
     <div class="likes-box">
-        <h2>いいね一覧</h2>
-
-        <%--仮で定義中,後でデータを取得するように変更 --%>
+        <h2>いいね一覧（仮表示）</h2>
         <ul>
             <li>ユーザーA → 10いいね</li>
             <li>ユーザーB → 7いいね</li>
@@ -99,11 +91,11 @@
     </div>
 
     <div class="menu">
-    <a href="accountList">アカウント一覧</a>
-    <a href="contact_list.jsp">お問い合わせ一覧</a>
-    <a href="deleteAccountList">削除済みアカウント一覧</a>
-</div>
-
+        <a href="accountList">アカウント一覧</a>
+        <a href="contact_list.jsp">お問い合わせ一覧</a>
+        <a href="deleteAccountList">削除済みアカウント一覧</a>
+        <a href="ranking">いいねランキング</a>
+    </div>
 
 </div>
 
