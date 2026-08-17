@@ -233,7 +233,7 @@ public class UserDao {
             pstmt.setString(4, user.getStatus());
             pstmt.setString(5, user.getFurigana());
             pstmt.setString(6, user.getGender());
-            pstmt.setString(7, user.getAge());
+            pstmt.setInt(7, user.getAge()); 
             pstmt.setString(8, user.getBio());
             pstmt.setString(9, user.getProfileImage());
 
@@ -302,6 +302,37 @@ public class UserDao {
             e.printStackTrace();
         }
     }
+ // ▼ 一般ユーザー一覧を取得
+    public List<UserData> getGeneralUserList() {
+
+        List<UserData> list = new ArrayList<>();
+
+        String sql = "SELECT id, name, furigana, gender, age, intro "
+                   + "FROM users "
+                   + "WHERE role IN ('general', 'user') AND status != 'deleted'\r\n";
+
+        try (Connection con = DBManager.getConnection();
+             PreparedStatement pstmt = con.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                UserData u = new UserData();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("name"));
+                u.setFurigana(rs.getString("furigana"));
+                u.setGender(rs.getString("gender"));
+                u.setAge(rs.getInt("age"));
+                u.setIntro(rs.getString("intro"));
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 
 
 }

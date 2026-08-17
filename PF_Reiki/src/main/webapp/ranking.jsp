@@ -79,7 +79,7 @@
         %>
                     <tr>
                         <td class="rank"><%= index++ %></td>
-                        <td><%= item.getUsername() %></td>
+                        <td><%= item.getName() %></td>
                         <td><%= item.getLikeCount() %></td>
                     </tr>
         <%

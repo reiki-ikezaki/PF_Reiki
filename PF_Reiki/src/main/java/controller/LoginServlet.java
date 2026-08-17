@@ -75,6 +75,8 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userId", user.getId());
             session.setAttribute("username", user.getName());
             session.setAttribute("user", user);
+            session.setAttribute("loginUser", user);
+
 
             // ▼ ロールで画面振り分け
             if ("admin".equals(user.getRole())) {

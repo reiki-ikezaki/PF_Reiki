@@ -95,6 +95,7 @@
         <a href="contact_list.jsp">お問い合わせ一覧</a>
         <a href="deleteAccountList">削除済みアカウント一覧</a>
         <a href="ranking">いいねランキング</a>
+        <a href="generalList">一般ユーザー一覧</a>
     </div>
 
 </div>

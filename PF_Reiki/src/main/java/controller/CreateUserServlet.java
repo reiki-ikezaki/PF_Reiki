@@ -102,7 +102,7 @@ public class CreateUserServlet extends HttpServlet {
         if ("user".equals(role)) {
             user.setFurigana(furigana);
             user.setGender(gender);
-            user.setAge(age);
+            user.setAge(Integer.parseInt(age));
             user.setBio(bio);
             user.setProfileImage(savedFileName); 
         }
