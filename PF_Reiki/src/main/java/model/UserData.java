@@ -15,6 +15,9 @@ public class UserData {
     private String bio;       
     private String intro;     
     private String profileImage;
+    private int likeCount;
+    
+
 
     public int getId() {
         return id;
@@ -106,4 +109,21 @@ public class UserData {
     public void setProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
+    public int getLikeCount() {
+        return likeCount;
+    }
+
+    public void setLikeCount(int likeCount) {
+        this.likeCount = likeCount;
+    }
+    private String profile;
+
+    public String getProfile() {
+        return profile;
+    }
+
+    public void setProfile(String profile) {
+        this.profile = profile;
+    }
+
 }

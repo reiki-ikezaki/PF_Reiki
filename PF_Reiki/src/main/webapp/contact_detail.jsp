@@ -43,8 +43,24 @@
     <p><b>メールアドレス:</b> <%= d.getEmail() %></p>
     <p><b>内容:</b><br><%= d.getContent() %></p>
     <p><b>ステータス:</b> <%= d.getStatus() %></p>
+    
+    <form action="status_update" method="post" style="margin-top:20px;">
+    <input type="hidden" name="id" value="<%= d.getId() %>">
+
+    <label><b>ステータス変更：</b></label>
+    <select name="status">
+        <option value="未対応" <%= d.getStatus().equals("未対応") ? "selected" : "" %>>未対応</option>
+        <option value="対応中" <%= d.getStatus().equals("対応中") ? "selected" : "" %>>対応中</option>
+        <option value="対応済み" <%= d.getStatus().equals("対応済み") ? "selected" : "" %>>対応済み</option>
+    </select>
+
+    <button type="submit" style="margin-left:10px;">変更する</button>
+</form>
+    
     <p><b>送信日:</b> <%= d.getCreatedAt() %></p>
     <p><b>更新日:</b> <%= d.getUpdatedAt() %></p>
+    
+    
 
     <a class="back-btn" href="contact_list">戻る</a>
 </div>

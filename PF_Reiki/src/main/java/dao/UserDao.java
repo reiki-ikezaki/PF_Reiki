@@ -52,6 +52,7 @@ public class UserDao {
 
         return user;
     }
+    
 
     public boolean updateUser(int id, String email, String password, String name) {
         try (Connection conn = DBManager.getConnection()) {
@@ -323,6 +324,30 @@ public class UserDao {
                 u.setGender(rs.getString("gender"));
                 u.setAge(rs.getInt("age"));
                 u.setIntro(rs.getString("intro"));
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    public List<UserData> findAllPublicUsers() {
+        List<UserData> list = new ArrayList<>();
+
+        String sql = "SELECT id, name, profile, like_count FROM users WHERE role = 'public'";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                UserData u = new UserData();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("name"));
+                u.setProfile(rs.getString("profile"));
+                u.setLikeCount(rs.getInt("like_count"));
                 list.add(u);
             }
 

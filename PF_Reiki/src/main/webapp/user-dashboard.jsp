@@ -85,9 +85,10 @@
     <a href="#">タイムライン</a>
 </div>
 
-<form action="LogoutServlet" method="post" class="logout-btn">
+<form action="logout" method="post" class="logout-btn">
     <button type="submit">ログアウト</button>
 </form>
+
 
 <div class="main">
     <div class="likes-box">

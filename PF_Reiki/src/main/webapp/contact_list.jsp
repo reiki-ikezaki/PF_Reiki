@@ -82,7 +82,10 @@
 <div class="header">
     <a class="back-btn" href="admin-dashboard.jsp">戻る</a>
     <span>お問い合わせ一覧</span>
-    <a class="logout" href="logout">ログアウト</a>
+    <form action="logout" method="post" class="logout-btn">
+    <button type="submit">ログアウト</button>
+</form>
+
 </div>
 
 <div class="main">
@@ -116,7 +119,8 @@
             <td><%= ing.getUpdatedAt() %></td>
             <td>
                 <a class="btn" href="contact_detail?id=<%= ing.getId() %>">詳細</a>
-                <a class="btn btn-delete" href="contact_delete?id=<%= ing.getId() %>">削除</a>
+                <a class="btn btn-delete" href="contact_destroy?id=<%= ing.getId() %>">削除</a>
+                
             </td>
         </tr>
         <%

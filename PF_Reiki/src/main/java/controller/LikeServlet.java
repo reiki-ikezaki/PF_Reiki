@@ -8,10 +8,22 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import dao.LikeDao;   // ★ 必須
+import dao.LikeDao;
 
 @WebServlet("/like")
 public class LikeServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        int userId = Integer.parseInt(request.getParameter("userId"));
+        int targetUserId = Integer.parseInt(request.getParameter("targetUserId"));
+
+        LikeDao dao = new LikeDao();
+        dao.insertLike(userId, targetUserId);
+
+        response.sendRedirect("public_top");
+    }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

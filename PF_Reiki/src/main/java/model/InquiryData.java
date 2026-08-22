@@ -3,98 +3,35 @@ package model;
 public class InquiryData {
 
     private int id;
-    private int categoryId;        // ★ JOIN用に追加（必要）
+    private int categoryId;
     private String categoryName;
-    private String email;
     private String content;
-    private String shortContent;   // ★ 一覧用の短縮本文（追加）
+    private String email;
     private String status;
-    private String createdAt;
-    private String updatedAt;
+    private String createdAt;  
+    private String updatedAt;  
 
-    public InquiryData() {}
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public InquiryData(int id, String categoryName, String email, String content,
-                       String status, String createdAt, String updatedAt) {
-        this.id = id;
-        this.categoryName = categoryName;
-        this.email = email;
-        this.content = content;
-        this.status = status;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
+    public int getCategoryId() { return categoryId; }
+    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
 
-    public int getId() {
-        return id;
-    }
+    public String getCategoryName() { return categoryName; }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 
-    public int getCategoryId() {
-        return categoryId;
-    }
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
 
-    public String getCategoryName() {
-        return categoryName;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public String getContent() {
-        return content;
-    }
+    public String getCreatedAt() { return createdAt; }
+    public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
 
-    public String getShortContent() {
-        return shortContent;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public String getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    // ★ String に修正（元は int で誤り）
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setShortContent(String shortContent) {
-        this.shortContent = shortContent;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(String updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public String getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
 }

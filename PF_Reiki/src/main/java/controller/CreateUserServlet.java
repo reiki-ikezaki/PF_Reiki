@@ -33,10 +33,20 @@ public class CreateUserServlet extends HttpServlet {
         String gender = request.getParameter("gender");
         String age = request.getParameter("age");
         String bio = request.getParameter("bio");
-        Part profileImage = request.getPart("profileImage");
+
+        Part profileImage = null;
+
+        try {
+            profileImage = request.getPart("profileImage");
+        } catch (Exception e) {
+            request.setAttribute("error", "画像は2MB以下にしてください。");
+            request.getRequestDispatcher("account-add.jsp").forward(request, response);
+            return;
+        }
 
         String error = null;
 
+        // ▼ 共通バリデーション
         if (username == null || username.length() > 255) {
             error = "ユーザー名は255文字以内で入力してください。";
         }
@@ -46,6 +56,7 @@ public class CreateUserServlet extends HttpServlet {
             error = "メールアドレスの形式が正しくありません。";
         }
 
+        // ▼ 一般ユーザー専用バリデーション
         if ("user".equals(role)) {
 
             if (furigana == null || furigana.length() > 255 ||
@@ -65,22 +76,40 @@ public class CreateUserServlet extends HttpServlet {
                 error = "自己紹介は1500文字以内で入力してください。";
             }
 
-            if (profileImage != null && profileImage.getSize() > (2 * 1024 * 1024)) {
-                error = "プロフィール画像は2MB以内でアップロードしてください。";
+            // ▼ 画像チェック（拡張子＋2MB）
+            if (profileImage != null && profileImage.getSize() > 0) {
+
+                String submittedName = profileImage.getSubmittedFileName().toLowerCase();
+
+                // 拡張子チェック
+                if (!(submittedName.endsWith(".jpg") ||
+                      submittedName.endsWith(".jpeg") ||
+                      submittedName.endsWith(".png") ||
+                      submittedName.endsWith(".gif"))) {
+
+                    error = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+                }
+
+                // サイズチェック
+                if (profileImage.getSize() > (2 * 1024 * 1024)) {
+                    error = "プロフィール画像は2MB以内でアップロードしてください。";
+                }
             }
         }
 
+        // ▼ エラーがあれば JSP に戻す
         if (error != null) {
             request.setAttribute("error", error);
             request.getRequestDispatcher("account-add.jsp").forward(request, response);
             return;
         }
 
+        // ▼ 画像保存処理
         String savedFileName = null;
 
         if ("user".equals(role) && profileImage != null && profileImage.getSize() > 0) {
 
-            String originalName = profileImage.getSubmittedFileName();
+            String originalName = profileImage.getSubmittedFileName().toLowerCase();
 
             String uploadDir = request.getServletContext().getRealPath("/img/profile");
 
@@ -93,6 +122,7 @@ public class CreateUserServlet extends HttpServlet {
             profileImage.write(path.toString());
         }
 
+        // ▼ UserData にセット
         UserData user = new UserData();
         user.setUsername(username);
         user.setEmail(email);
@@ -107,6 +137,7 @@ public class CreateUserServlet extends HttpServlet {
             user.setProfileImage(savedFileName); 
         }
 
+        // ▼ DB登録
         UserDao dao = new UserDao();
         dao.insertUser(user);
 

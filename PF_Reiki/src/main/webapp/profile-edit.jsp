@@ -14,7 +14,6 @@
         padding: 0;
     }
 
-    /* ログアウトボタン */
     .logout-btn {
         position: absolute;
         top: 10px;
@@ -95,15 +94,15 @@
 </head>
 <body>
 
-
-<form action="LogoutServlet" method="post" class="logout-btn">
+<form action="logout" method="post" class="logout-btn">
     <button type="submit">ログアウト</button>
 </form>
+
 
 <div class="container">
     <h1>プロフィール編集</h1>
 
-    <form action="profileEdit" method="post">
+    <form action="profileEdit" method="post" enctype="multipart/form-data">
 
         <label>メールアドレス</label>
         <input type="text" name="email" value="${user.email}">
@@ -114,12 +113,45 @@
         <label>名前</label>
         <input type="text" name="name" value="${user.name}">
 
+        <label>プロフィール画像（jpg/png/gif・2MB以下）</label>
+        <input type="file" name="profileImage" accept="image/*">
+
         <button type="submit" class="submit-btn">更新</button>
 
         <div class="msg error">${error}</div>
         <div class="msg success">${success}</div>
     </form>
 </div>
+
+<!-- ★ ファイル選択時に即エラー表示するスクリプト -->
+<script>
+document.querySelector("input[name='profileImage']").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const errorBox = document.querySelector(".msg.error");
+
+    // ▼ 拡張子チェック
+    const validExt = ["jpg", "jpeg", "png", "gif"];
+    const ext = file.name.split(".").pop().toLowerCase();
+
+    if (!validExt.includes(ext)) {
+        errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+        e.target.value = ""; // 選択解除
+        return;
+    }
+
+    // ▼ 2MBチェック
+    if (file.size > 1024 * 1024 * 2) {
+        errorBox.textContent = "画像は2MB以下にしてください。";
+        e.target.value = ""; // 選択解除
+        return;
+    }
+
+    // ▼ 問題なし → エラー消す
+    errorBox.textContent = "";
+});
+</script>
 
 </body>
 </html>

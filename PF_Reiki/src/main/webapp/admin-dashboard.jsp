@@ -74,9 +74,10 @@
 </head>
 <body>
 
-<form action="LogoutServlet" method="post" class="logout-btn">
+<form action="logout" method="post" class="logout-btn">
     <button type="submit">ログアウト</button>
 </form>
+
 
 <div class="container">
     <h1>管理者ダッシュボード</h1>
@@ -92,10 +93,10 @@
 
     <div class="menu">
         <a href="accountList">アカウント一覧</a>
-        <a href="contact_list.jsp">お問い合わせ一覧</a>
+        <a href="contact_list">お問い合わせ一覧</a>
         <a href="deleteAccountList">削除済みアカウント一覧</a>
         <a href="ranking">いいねランキング</a>
-        <a href="generalList">一般ユーザー一覧</a>
+        
     </div>
 
 </div>

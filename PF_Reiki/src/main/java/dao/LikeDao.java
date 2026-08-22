@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.LikeRanking;
+import model.UserData;
 
 public class LikeDao {
 
@@ -105,4 +106,28 @@ public class LikeDao {
 
         return list;
     }
+    public List<UserData> getRanking() {
+        List<UserData> list = new ArrayList<>();
+
+        String sql = "SELECT id, name, like_count FROM users ORDER BY like_count DESC";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                UserData u = new UserData();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("name"));
+                u.setLikeCount(rs.getInt("like_count"));
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }

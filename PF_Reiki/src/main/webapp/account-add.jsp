@@ -23,6 +23,11 @@
         padding: 8px;
         margin-bottom: 12px;
     }
+
+    .file-error {
+        color: red;
+        margin-top: 10px;
+    }
 </style>
 
 <script>
@@ -91,7 +96,8 @@ function toggleRole() {
         <textarea name="bio" rows="4"></textarea>
 
         <label>プロフィール画像</label>
-        <input type="file" name="profileImage">
+        <input type="file" name="profileImage" id="profileImageInput">
+        <div class="file-error" id="fileError"></div>
 
     </div>
 
@@ -110,6 +116,40 @@ function toggleRole() {
 
 </form>
 <!-- ★★★ フォームここまで ★★★ -->
+
+<!-- ★★★ 画像チェック（貼るだけで完成） ★★★ -->
+<script>
+document.getElementById("profileImageInput").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    const errorBox = document.getElementById("fileError");
+
+    if (!file) {
+        errorBox.textContent = "";
+        return;
+    }
+
+    // ▼ 許可する拡張子
+    const validExt = ["jpg", "jpeg", "png", "gif"];
+    const ext = file.name.split(".").pop().toLowerCase();
+
+    // ▼ 拡張子チェック
+    if (!validExt.includes(ext)) {
+        errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+        e.target.value = ""; // 選択解除
+        return;
+    }
+
+    // ▼ 2MBチェック
+    if (file.size > 1024 * 1024 * 2) {
+        errorBox.textContent = "画像は2MB以下にしてください。";
+        e.target.value = ""; // 選択解除
+        return;
+    }
+
+    // ▼ 問題なし → エラー消す
+    errorBox.textContent = "";
+});
+</script>
 
 </body>
 </html>

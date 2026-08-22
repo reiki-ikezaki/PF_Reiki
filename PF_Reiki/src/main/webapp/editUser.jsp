@@ -41,7 +41,7 @@
         font-weight: bold;
     }
 
-    input[type="text"], input[type="password"] {
+    input[type="text"], input[type="password"], input[type="file"] {
         width: 100%;
         padding: 8px;
         border: 1px solid #ccc;
@@ -62,6 +62,11 @@
     .btn:hover {
         background: #0056b3;
     }
+
+    .file-error {
+        color: red;
+        margin-top: 6px;
+    }
 </style>
 
 </head>
@@ -71,7 +76,7 @@
 
     <h1>アカウント編集</h1>
 
-    <form action="updateUser" method="post">
+    <form action="updateUser" method="post" enctype="multipart/form-data">
 
         <input type="hidden" name="id" value="<%= user.getId() %>">
 
@@ -95,11 +100,54 @@
             <input type="text" name="name" value="<%= user.getName() %>">
         </div>
 
+        <!-- ★ 管理者も画像変更できるように追加 -->
+        <div class="form-group">
+            <label>プロフィール画像（jpg / jpeg / png / gif・2MB以下）</label>
+
+            <% if (user.getProfileImage() != null) { %>
+                <img src="img/profile/<%= user.getProfileImage() %>"
+                     style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin-bottom:10px;">
+            <% } %>
+
+            <input type="file" name="profileImage" id="profileImageInput">
+            <div id="fileError" class="file-error"></div>
+        </div>
+
         <button type="submit" class="btn">更新する</button>
 
     </form>
 
 </div>
+
+<!-- ★ 画像チェック（貼るだけで完成） -->
+<script>
+document.getElementById("profileImageInput").addEventListener("change", function(e) {
+    const file = e.target.files[0];
+    const errorBox = document.getElementById("fileError");
+
+    if (!file) {
+        errorBox.textContent = "";
+        return;
+    }
+
+    const validExt = ["jpg", "jpeg", "png", "gif"];
+    const ext = file.name.split(".").pop().toLowerCase();
+
+    if (!validExt.includes(ext)) {
+        errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+        e.target.value = "";
+        return;
+    }
+
+    if (file.size > 1024 * 1024 * 2) {
+        errorBox.textContent = "画像は2MB以下にしてください。";
+        e.target.value = "";
+        return;
+    }
+
+    errorBox.textContent = "";
+});
+</script>
 
 </body>
 </html>

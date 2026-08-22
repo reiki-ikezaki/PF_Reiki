@@ -109,9 +109,10 @@
     <div class="top-menu">
         <a href="account-add.jsp" class="add-btn">アカウント追加</a>
 
-        <form action="LogoutServlet" method="post" class="logout-form">
-            <button type="submit" class="logout-btn">ログアウト</button>
-        </form>
+        <form action="logout" method="post">
+    <button type="submit">ログアウト</button>
+</form>
+        
     </div>
 
     <h1>アカウント一覧</h1>
@@ -123,7 +124,7 @@
             <th>名前</th>
             <th>権限</th>
             <th>ステータス</th>
-            <th>画像</th> <!-- ★追加 -->
+            <th>画像</th>
             <th>操作</th>
         </tr>
 
@@ -140,13 +141,21 @@
             <td><%= u.getRole() %></td>
             <td><%= u.getStatus() %></td>
 
-            <!-- ★ 画像列 -->
+            <!-- ★ 画像列（貼るだけで完成する強化版） -->
             <td>
-                <% if (u.getProfileImage() != null) { %>
-                    <img src="img/profile/<%= u.getProfileImage() %>" width="80">
-                <% } else { %>
-                    なし
-                <% } %>
+                <%
+                    String img = u.getProfileImage();
+                    if (img != null && !img.isEmpty()) {
+                %>
+                    <img src="img/profile/<%= img %>"
+                         style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #ccc;">
+                <%
+                    } else {
+                %>
+                    <span style="color:#888;">なし</span>
+                <%
+                    }
+                %>
             </td>
 
             <!-- ★ 操作列 -->

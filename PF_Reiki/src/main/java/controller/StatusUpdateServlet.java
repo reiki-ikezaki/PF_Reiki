@@ -10,20 +10,20 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dao.InquiryDao;
 
-@WebServlet("/contact")
-public class ContactStatusServlet extends HttpServlet {
+@WebServlet("/status_update")
+public class StatusUpdateServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        int categoryId = Integer.parseInt(request.getParameter("category_id"));
-        String content = request.getParameter("content");
-        String email = request.getParameter("email");
+        request.setCharacterEncoding("UTF-8");
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        String status = request.getParameter("status");
 
         InquiryDao dao = new InquiryDao();
-        dao.insertInquiry(categoryId, content, email);
+        dao.updateStatus(id, status);
 
-        // ★ 完了画面へ移動
-        response.sendRedirect("contact_success.jsp");
+        response.sendRedirect("contact_detail?id=" + id);
     }
 }
