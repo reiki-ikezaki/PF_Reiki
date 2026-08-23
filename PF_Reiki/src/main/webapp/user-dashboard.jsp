@@ -82,7 +82,7 @@
     <!-- ★ プロフィール編集画面へ遷移 -->
     <a href="profile-edit.jsp">プロフィール</a>
 
-    <a href="#">タイムライン</a>
+    <a href="public_top">タイムライン</a>
 </div>
 
 <form action="logout" method="post" class="logout-btn">

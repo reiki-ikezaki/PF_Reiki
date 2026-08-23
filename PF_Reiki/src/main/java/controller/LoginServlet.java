@@ -80,9 +80,9 @@ public class LoginServlet extends HttpServlet {
 
             // ▼ ロールで画面振り分け
             if ("admin".equals(user.getRole())) {
-                response.sendRedirect("admin-dashboard.jsp");
+                response.sendRedirect("adminDashboard");
             } else {
-                response.sendRedirect("user-dashboard.jsp");
+                response.sendRedirect("userDashboard");
             }
 
         } else {

@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="model.LikeRanking" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -83,11 +85,26 @@
     <h1>管理者ダッシュボード</h1>
 
     <div class="likes-box">
-        <h2>いいね一覧（仮表示）</h2>
+        <h2>いいねランキング（今年・上位5件）</h2>
         <ul>
-            <li>ユーザーA → 10いいね</li>
-            <li>ユーザーB → 7いいね</li>
-            <li>ユーザーC → 3いいね</li>
+            <%
+                List<LikeRanking> rankingList = (List<LikeRanking>) request.getAttribute("rankingList");
+                if (rankingList != null) {
+                    int shown = 0;
+                    for (LikeRanking r : rankingList) {
+                        if (shown >= 5) break;
+                        shown++;
+            %>
+                <li><%= r.getName() %> → <%= r.getLikeCount() %>いいね</li>
+            <%
+                    }
+                    if (shown == 0) {
+            %>
+                <li>まだいいねがありません</li>
+            <%
+                    }
+                }
+            %>
         </ul>
     </div>
 
@@ -96,7 +113,9 @@
         <a href="contact_list">お問い合わせ一覧</a>
         <a href="deleteAccountList">削除済みアカウント一覧</a>
         <a href="ranking">いいねランキング</a>
-        
+        <a href="generalList">一般ユーザー一覧</a>
+        <a href="profile-edit.jsp">アカウント設定</a>
+
     </div>
 
 </div>

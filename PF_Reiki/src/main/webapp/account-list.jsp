@@ -59,6 +59,16 @@
         font-weight: bold;
     }
 
+    .back-link {
+        color: #007bff;
+        text-decoration: none;
+        align-self: center;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -83,14 +93,23 @@
         background: #f2f2f2;
     }
 
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
     .btn {
+        display: inline-block;
+        min-width: 84px;
         padding: 6px 12px;
         border-radius: 4px;
         text-decoration: none;
         color: white;
         font-size: 14px;
+        text-align: center;
         white-space: nowrap;
-        margin-right: 6px;
     }
 
     .edit { background: #28a745; }
@@ -98,7 +117,7 @@
     .delete { background: #dc3545; }
 
     td:last-child {
-        width: 280px;
+        width: 220px;
     }
 </style>
 </head>
@@ -107,12 +126,13 @@
 <div class="container">
 
     <div class="top-menu">
+        <a href="adminDashboard" class="back-link">← 管理者ダッシュボードに戻る</a>
         <a href="account-add.jsp" class="add-btn">アカウント追加</a>
 
         <form action="logout" method="post">
     <button type="submit">ログアウト</button>
 </form>
-        
+
     </div>
 
     <h1>アカウント一覧</h1>
@@ -147,7 +167,7 @@
                     String img = u.getProfileImage();
                     if (img != null && !img.isEmpty()) {
                 %>
-                    <img src="img/profile/<%= img %>"
+                    <img src="profileImage?id=<%= u.getId() %>"
                          style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #ccc;">
                 <%
                     } else {
@@ -160,15 +180,18 @@
 
             <!-- ★ 操作列 -->
             <td>
-                <a href="editUser?id=<%= u.getId() %>" class="btn edit">編集</a>
+                <div class="actions">
+                    <a href="editUser?id=<%= u.getId() %>" class="btn edit">編集</a>
 
-                <% if ("active".equals(u.getStatus())) { %>
-                    <a href="accountStatus?id=<%= u.getId() %>" class="btn ban">アクセス禁止</a>
-                <% } else { %>
-                    <a href="accountStatus?id=<%= u.getId() %>" class="btn edit">アクセス許可</a>
-                <% } %>
+                    <% if ("active".equals(u.getStatus())) { %>
+                        <a href="accountStatus?id=<%= u.getId() %>" class="btn ban">アクセス禁止</a>
+                    <% } else { %>
+                        <a href="accountStatus?id=<%= u.getId() %>" class="btn edit">アクセス許可</a>
+                    <% } %>
 
-                <a href="deleteUser?id=<%= u.getId() %>" class="btn delete">削除</a>
+                    <a href="deleteUser?id=<%= u.getId() %>" class="btn delete"
+                       onclick="return confirm('このアカウントを削除します。よろしいですか？');">削除</a>
+                </div>
             </td>
         </tr>
         <%

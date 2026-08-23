@@ -1,7 +1,8 @@
 package controller;
 
-import java.io.File;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.Part;
 
 import dao.UserDao;
 import model.UserData;
+import util.AccountValidator;
 
 @WebServlet("/profileEdit")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 2) // ★ 2MB制限
@@ -27,6 +29,8 @@ public class ProfileEditServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
         UserData user = (UserData) session.getAttribute("user");
+
+        byte[] imageBytes = null;
 
         try {
             // ▼ 画像ファイル取得
@@ -55,15 +59,16 @@ public class ProfileEditServlet extends HttpServlet {
                     return;
                 }
 
-                // ▼ 保存処理
-                String fileName = System.currentTimeMillis() + "_" + submittedName;
-                String uploadPath = request.getServletContext().getRealPath("/uploads");
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) uploadDir.mkdirs();
-
-                part.write(uploadPath + "/" + fileName);
-
-                user.setProfileImage(fileName);
+                // ▼ DB（BLOB）に保存するためバイト列として読み込む
+                try (InputStream in = part.getInputStream();
+                     ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                    byte[] buf = new byte[8192];
+                    int n;
+                    while ((n = in.read(buf)) != -1) {
+                        out.write(buf, 0, n);
+                    }
+                    imageBytes = out.toByteArray();
+                }
             }
 
         } catch (Exception e) {
@@ -77,6 +82,10 @@ public class ProfileEditServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String name = request.getParameter("name");
+        String furigana = request.getParameter("furigana");
+        String gender = request.getParameter("gender");
+        String ageStr = request.getParameter("age");
+        String bio = request.getParameter("bio");
 
         if (!isValidEmail(email)) {
             request.setAttribute("error", "メールアドレスの形式が不正、または255文字を超えています。");
@@ -102,8 +111,26 @@ public class ProfileEditServlet extends HttpServlet {
             return;
         }
 
+        // ▼ フリガナ/性別/年齢/自己紹介のバリデーション
+        String error = AccountValidator.validateFurigana(furigana);
+        if (error == null) error = AccountValidator.validateGender(gender);
+        if (error == null) error = AccountValidator.validateAge(ageStr);
+        if (error == null) error = AccountValidator.validateBio(bio);
+
+        if (error != null) {
+            request.setAttribute("error", error);
+            forward(request, response);
+            return;
+        }
+
+        int age = 0;
+        if (ageStr != null && !ageStr.isEmpty()) {
+            age = Integer.parseInt(ageStr);
+        }
+
         UserDao dao = new UserDao();
-        boolean updated = dao.updateUser(user.getId(), email, password, name);
+        boolean updated = dao.updateUser(user.getId(), email, password, name,
+                furigana, gender, age, bio, imageBytes);
 
         if (!updated) {
             request.setAttribute("error", "更新に失敗しました。");
@@ -114,6 +141,10 @@ public class ProfileEditServlet extends HttpServlet {
         user.setEmail(email);
         user.setPassword(password);
         user.setName(name);
+        user.setFurigana(furigana);
+        user.setGender(gender);
+        user.setAge(age);
+        user.setBio(bio);
         session.setAttribute("user", user);
 
         request.setAttribute("success", "プロフィールを更新しました！");

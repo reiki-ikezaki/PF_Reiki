@@ -1,5 +1,6 @@
 package dao;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,29 +11,19 @@ import model.UserData;
 
 public class UserDao {
 
+    // ▼ ログイン用
     public UserData findByLogin(String username, String password) {
-    	
-    	System.out.println("【findByLogin 開始】");
-        System.out.println("受け取った username = " + username);
-        System.out.println("受け取った password = " + password);
-        
         UserData user = null;
 
         try (Connection conn = DBManager.getConnection()) {
-        	
-        	System.out.println("DB接続成功: " + conn);
 
             String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
             PreparedStatement pStmt = conn.prepareStatement(sql);
-            
-            System.out.println("SQL = " + sql);
-            
+
             pStmt.setString(1, username);
             pStmt.setString(2, password);
 
             ResultSet rs = pStmt.executeQuery();
-            System.out.println("SQL実行完了");
-            
 
             if (rs.next()) {
                 user = new UserData();
@@ -44,6 +35,11 @@ public class UserDao {
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
                 user.setProfileImage(rs.getString("profile_image"));
+                user.setBio(rs.getString("bio"));
+                user.setAge(rs.getInt("age"));
+                user.setGender(rs.getString("gender"));
+                user.setFurigana(rs.getString("furigana"));
+                user.setIntro(rs.getString("intro"));
             }
 
         } catch (Exception e) {
@@ -52,18 +48,29 @@ public class UserDao {
 
         return user;
     }
-    
 
+    // ▼ プロフィール編集
     public boolean updateUser(int id, String email, String password, String name) {
-        try (Connection conn = DBManager.getConnection()) {
+        return updateUser(id, email, password, name, null);
+    }
 
-            String sql = "UPDATE users SET email = ?, password = ?, name = ? WHERE id = ?";
-            PreparedStatement pStmt = conn.prepareStatement(sql);
+    // ▼ プロフィール編集（画像変更あり・BLOB保存）
+    public boolean updateUser(int id, String email, String password, String name, byte[] imageBytes) {
+        String sql = (imageBytes != null)
+                ? "UPDATE users SET email = ?, password = ?, name = ?, profile_image = ? WHERE id = ?"
+                : "UPDATE users SET email = ?, password = ?, name = ? WHERE id = ?";
 
-            pStmt.setString(1, email);
-            pStmt.setString(2, password);
-            pStmt.setString(3, name);
-            pStmt.setInt(4, id);
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pStmt = conn.prepareStatement(sql)) {
+
+            int i = 1;
+            pStmt.setString(i++, email);
+            pStmt.setString(i++, password);
+            pStmt.setString(i++, name);
+            if (imageBytes != null) {
+                pStmt.setBytes(i++, imageBytes);
+            }
+            pStmt.setInt(i++, id);
 
             int result = pStmt.executeUpdate();
             return result == 1;
@@ -75,6 +82,90 @@ public class UserDao {
         return false;
     }
 
+    // ▼ プロフィール編集（一般ユーザー自身用・フリガナ/性別/年齢/自己紹介も含めて更新）
+    public boolean updateUser(int id, String email, String password, String name,
+            String furigana, String gender, int age, String bio, byte[] imageBytes) {
+
+        String sql = (imageBytes != null)
+                ? "UPDATE users SET email = ?, password = ?, name = ?, furigana = ?, "
+                        + "gender = ?, age = ?, bio = ?, profile_image = ? WHERE id = ?"
+                : "UPDATE users SET email = ?, password = ?, name = ?, furigana = ?, "
+                        + "gender = ?, age = ?, bio = ? WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pStmt = conn.prepareStatement(sql)) {
+
+            int i = 1;
+            pStmt.setString(i++, email);
+            pStmt.setString(i++, password);
+            pStmt.setString(i++, name);
+            pStmt.setString(i++, furigana);
+            pStmt.setString(i++, gender);
+            pStmt.setInt(i++, age);
+            pStmt.setString(i++, bio);
+            if (imageBytes != null) {
+                pStmt.setBytes(i++, imageBytes);
+            }
+            pStmt.setInt(i++, id);
+
+            int result = pStmt.executeUpdate();
+            return result == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // ▼ アカウント編集（管理者用・種別/ステータス/各項目まとめて更新）
+    //    password は null または空文字なら「変更しない」として扱う
+    public boolean updateAccount(UserData user, String password, byte[] imageBytes) {
+        boolean changePassword = password != null && !password.isEmpty();
+
+        StringBuilder sql = new StringBuilder(
+                "UPDATE users SET role = ?, status = ?, username = ?, email = ?, name = ?, "
+                        + "furigana = ?, gender = ?, age = ?, bio = ?");
+        if (changePassword) {
+            sql.append(", password = ?");
+        }
+        if (imageBytes != null) {
+            sql.append(", profile_image = ?");
+        }
+        sql.append(" WHERE id = ?");
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
+            int i = 1;
+            pstmt.setString(i++, user.getRole());
+            pstmt.setString(i++, user.getStatus());
+            pstmt.setString(i++, user.getUsername());
+            pstmt.setString(i++, user.getEmail());
+            pstmt.setString(i++, user.getName());
+            pstmt.setString(i++, user.getFurigana());
+            pstmt.setString(i++, user.getGender());
+            pstmt.setInt(i++, user.getAge());
+            pstmt.setString(i++, user.getBio());
+            if (changePassword) {
+                pstmt.setString(i++, password);
+            }
+            if (imageBytes != null) {
+                pstmt.setBytes(i++, imageBytes);
+            }
+            pstmt.setInt(i++, user.getId());
+
+            int result = pstmt.executeUpdate();
+            return result == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // ▼ 全ユーザー一覧
     public List<UserData> findAll() {
         List<UserData> list = new ArrayList<>();
 
@@ -95,6 +186,11 @@ public class UserDao {
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
                 user.setProfileImage(rs.getString("profile_image"));
+                user.setBio(rs.getString("bio"));
+                user.setAge(rs.getInt("age"));
+                user.setGender(rs.getString("gender"));
+                user.setFurigana(rs.getString("furigana"));
+                user.setIntro(rs.getString("intro"));
                 list.add(user);
             }
 
@@ -105,6 +201,7 @@ public class UserDao {
         return list;
     }
 
+    // ▼ ステータス切り替え
     public void toggleStatus(int userId) {
         String sql = "UPDATE users "
                    + "SET status = CASE "
@@ -123,6 +220,7 @@ public class UserDao {
         }
     }
 
+    // ▼ 論理削除
     public void logicalDelete(int id) {
         String sql = "UPDATE users SET status = 'deleted' WHERE id = ?";
 
@@ -137,6 +235,7 @@ public class UserDao {
         }
     }
 
+    // ▼ ID検索
     public UserData findById(int id) {
         UserData user = null;
 
@@ -158,6 +257,11 @@ public class UserDao {
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
                 user.setProfileImage(rs.getString("profile_image"));
+                user.setBio(rs.getString("bio"));
+                user.setAge(rs.getInt("age"));
+                user.setGender(rs.getString("gender"));
+                user.setFurigana(rs.getString("furigana"));
+                user.setIntro(rs.getString("intro"));
             }
 
         } catch (Exception e) {
@@ -166,6 +270,7 @@ public class UserDao {
         return user;
     }
 
+    // ▼ ページング
     public List<UserData> findPage(int offset, int limit) {
         List<UserData> list = new ArrayList<>();
 
@@ -189,6 +294,11 @@ public class UserDao {
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
                 user.setProfileImage(rs.getString("profile_image"));
+                user.setBio(rs.getString("bio"));
+                user.setAge(rs.getInt("age"));
+                user.setGender(rs.getString("gender"));
+                user.setFurigana(rs.getString("furigana"));
+                user.setIntro(rs.getString("intro"));
                 list.add(user);
             }
 
@@ -199,6 +309,7 @@ public class UserDao {
         return list;
     }
 
+    // ▼ ユーザー数
     public int countUsers() {
         int count = 0;
 
@@ -219,25 +330,37 @@ public class UserDao {
         return count;
     }
 
-    public boolean insertUser(UserData user) {
+ // ▼ アカウント追加（画像対応版）
+    public boolean insertUser(UserData user, InputStream fileContent) {
 
         String sql = "INSERT INTO users "
-                + "(username, email, role, status, furigana, gender, age, bio, profile_image) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "(username, email, password, name, role, status, profile_image, bio, age, gender, furigana, intro) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getEmail());
-            pstmt.setString(3, user.getRole());
-            pstmt.setString(4, user.getStatus());
-            pstmt.setString(5, user.getFurigana());
-            pstmt.setString(6, user.getGender());
-            pstmt.setInt(7, user.getAge()); 
-            pstmt.setString(8, user.getBio());
-            pstmt.setString(9, user.getProfileImage());
+            pstmt.setString(3, user.getPassword() != null ? user.getPassword() : "");
+            pstmt.setString(4, user.getName());
+            pstmt.setString(5, user.getRole());
+            pstmt.setString(6, user.getStatus());
 
+            // ▼ 画像（BLOB）
+            if (fileContent != null) {
+                pstmt.setBlob(7, fileContent);
+            } else {
+                pstmt.setNull(7, java.sql.Types.BLOB);
+            }
+
+            pstmt.setString(8, user.getBio());
+            pstmt.setInt(9, user.getAge());
+            pstmt.setString(10, user.getGender());
+            pstmt.setString(11, user.getFurigana());
+            pstmt.setString(12, user.getIntro());
+
+            
             int result = pstmt.executeUpdate();
             return result == 1;
 
@@ -248,6 +371,29 @@ public class UserDao {
         return false;
     }
 
+
+    // ▼ プロフィール画像バイナリ取得（配信用）
+    public byte[] getProfileImageBytes(int id) {
+        String sql = "SELECT profile_image FROM users WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getBytes("profile_image");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    // ▼ 削除済みユーザー一覧
     public List<UserData> findDeletedUsers() {
         List<UserData> list = new ArrayList<>();
 
@@ -267,6 +413,11 @@ public class UserDao {
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
                 user.setProfileImage(rs.getString("profile_image"));
+                user.setBio(rs.getString("bio"));
+                user.setAge(rs.getInt("age"));
+                user.setGender(rs.getString("gender"));
+                user.setFurigana(rs.getString("furigana"));
+                user.setIntro(rs.getString("intro"));
                 list.add(user);
             }
 
@@ -277,6 +428,7 @@ public class UserDao {
         return list;
     }
 
+    // ▼ 物理削除
     public void deleteUserPermanent(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
 
@@ -290,6 +442,8 @@ public class UserDao {
             e.printStackTrace();
         }
     }
+
+    // ▼ 復活
     public void restoreAccount(int id) {
         String sql = "UPDATE users SET status = 'active' WHERE id = ?";
 
@@ -303,50 +457,35 @@ public class UserDao {
             e.printStackTrace();
         }
     }
- // ▼ 一般ユーザー一覧を取得
+
+    // ▼ 一般ユーザー一覧（公開画面）
     public List<UserData> getGeneralUserList() {
 
         List<UserData> list = new ArrayList<>();
 
-        String sql = "SELECT id, name, furigana, gender, age, intro "
-                   + "FROM users "
-                   + "WHERE role IN ('general', 'user') AND status != 'deleted'\r\n";
+        // ▼ profile_image(BLOB)は一覧に不要なのでSELECTしない（画像は /profileImage?id= から個別取得）。
+        //    いいね数はGROUP BYではなく相関サブクエリで求める（BLOB列をGROUP BYに含めると
+        //    MySQLのソートメモリを使い果たすことがあるため）。
+        String sql = "SELECT u.id, u.username, u.name, u.email, u.furigana, u.gender, u.age, u.bio, "
+                   + "(SELECT COUNT(*) FROM likes l WHERE l.target_user_id = u.id) AS like_count "
+                   + "FROM users u "
+                   + "WHERE u.role = 'user' AND u.status != 'deleted' "
+                   + "ORDER BY u.id";
 
-        try (Connection con = DBManager.getConnection();
-             PreparedStatement pstmt = con.prepareStatement(sql);
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 UserData u = new UserData();
                 u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
                 u.setName(rs.getString("name"));
+                u.setEmail(rs.getString("email"));
                 u.setFurigana(rs.getString("furigana"));
                 u.setGender(rs.getString("gender"));
                 u.setAge(rs.getInt("age"));
-                u.setIntro(rs.getString("intro"));
-                list.add(u);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-    public List<UserData> findAllPublicUsers() {
-        List<UserData> list = new ArrayList<>();
-
-        String sql = "SELECT id, name, profile, like_count FROM users WHERE role = 'public'";
-
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                UserData u = new UserData();
-                u.setId(rs.getInt("id"));
-                u.setName(rs.getString("name"));
-                u.setProfile(rs.getString("profile"));
+                u.setBio(rs.getString("bio"));
                 u.setLikeCount(rs.getInt("like_count"));
                 list.add(u);
             }
@@ -357,7 +496,5 @@ public class UserDao {
 
         return list;
     }
-
-
 
 }

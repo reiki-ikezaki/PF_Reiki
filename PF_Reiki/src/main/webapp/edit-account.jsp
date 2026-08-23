@@ -23,6 +23,16 @@
         padding: 8px;
         margin-bottom: 12px;
     }
+
+    .back-link {
+        align-self: center;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
 </style>
 
 <script>
@@ -44,7 +54,9 @@ function toggleRole() {
 
 <h1>アカウント編集</h1>
 
-<form action="EditUserServlet" method="post" enctype="multipart/form-data">
+<div class="msg" style="color:red;">${error}</div>
+
+<form action="editUser" method="post" enctype="multipart/form-data">
 
     <!-- ▼ ID（編集時は変更不可） -->
     <input type="hidden" name="id" value="${user.id}">
@@ -77,17 +89,36 @@ function toggleRole() {
         </div>
     </div>
 
-    <!-- ▼ 一般ユーザー項目 -->
-    <div id="userFields" class="vertical" style="${user.role == 'user' ? '' : 'display:none;'}">
+    <!-- ▼ 共通項目（ユーザー種別によらず必須） -->
+    <div class="vertical">
 
         <label>ユーザー名</label>
         <input type="text" name="username" value="${user.username}">
 
         <label>メールアドレス</label>
-        <input type="email" name="email" value="${user.email}">
+        <input type="email" name="email" value="${user.email}" maxlength="255">
 
-        <label>ふりがな</label>
-        <input type="text" name="furigana" value="${user.furigana}">
+        <label>名前</label>
+        <input type="text" name="name" value="${user.name}" maxlength="255">
+
+        <label>パスワード（変更する場合のみ入力・半角英数字と _ - で8〜32文字）</label>
+        <input type="password" name="password" placeholder="変更する場合のみ入力" maxlength="32" autocomplete="new-password">
+
+        <label>プロフィール画像</label><br>
+        <img src="profileImage?id=${user.id}"
+             style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0;"
+             onerror="this.style.display='none';">
+        <br>
+        <label>変更する場合のみ選択</label>
+        <input type="file" name="profileImage">
+
+    </div>
+
+    <!-- ▼ 一般ユーザー項目 -->
+    <div id="userFields" class="vertical" style="${user.role == 'user' ? '' : 'display:none;'}">
+
+        <label>ふりがな（ひらがなのみ）</label>
+        <input type="text" name="furigana" value="${user.furigana}" maxlength="255">
 
         <label>性別</label>
         <select name="gender">
@@ -97,28 +128,21 @@ function toggleRole() {
         </select>
 
         <label>年齢</label>
-        <input type="number" name="age" value="${user.age}">
+        <input type="number" name="age" value="${user.age}" min="0" max="999">
 
         <label>自己紹介</label>
-        <textarea name="bio" rows="4">${user.bio}</textarea>
-
-        <label>プロフィール画像（変更する場合のみ選択）</label>
-        <input type="file" name="profileImage">
+        <textarea name="bio" rows="4" maxlength="1500">${user.bio}</textarea>
 
     </div>
 
     <!-- ▼ 管理者項目 -->
     <div id="adminFields" class="vertical" style="${user.role == 'admin' ? '' : 'display:none;'}">
-
-        <label>ユーザー名</label>
-        <input type="text" name="username" value="${user.username}">
-
-        <label>メールアドレス</label>
-        <input type="email" name="email" value="${user.email}">
-
     </div>
 
-    <button type="submit">更新する</button>
+    <div class="btn-area" style="margin-top:20px; display:flex; gap:20px;">
+        <button type="submit">更新する</button>
+        <a href="accountList" class="back-link">アカウント一覧に戻る</a>
+    </div>
 
 </form>
 

@@ -106,7 +106,8 @@
             <td><%= u.getStatus() %></td>
 
             <td>
-                <a href="deleteUserPermanent?id=<%= u.getId() %>" class="btn delete">完全削除</a>
+                <a href="deleteUserPermanent?id=<%= u.getId() %>" class="btn delete"
+                   onclick="return confirm('このアカウントを完全に削除します。この操作は取り消せません。よろしいですか？');">完全削除</a>
             </td>
 
             <td>

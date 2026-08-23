@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.InquiryData" %>
+<%@ page import="util.HtmlUtil" %>
 
 <!DOCTYPE html>
 <html>
@@ -80,7 +81,7 @@
 <body>
 
 <div class="header">
-    <a class="back-btn" href="admin-dashboard.jsp">戻る</a>
+    <a class="back-btn" href="adminDashboard">戻る</a>
     <span>お問い合わせ一覧</span>
     <form action="logout" method="post" class="logout-btn">
     <button type="submit">ログアウト</button>
@@ -110,10 +111,15 @@
             if (list != null) {
                 for (InquiryData ing : list) {
         %>
+        <%
+            String content = ing.getContent();
+            String preview = (content == null) ? "" :
+                (content.length() > 10 ? content.substring(0, 10) + "…" : content);
+        %>
         <tr>
-            <td><%= ing.getCategoryName() %></td>
-            <td><%= ing.getEmail() %></td>
-            <td><%= ing.getContent() %></td>
+            <td><%= HtmlUtil.escape(ing.getCategoryName()) %></td>
+            <td><%= HtmlUtil.escape(ing.getEmail()) %></td>
+            <td><%= HtmlUtil.escape(preview) %></td>
             <td><%= ing.getStatus() %></td>
             <td><%= ing.getCreatedAt() %></td>
             <td><%= ing.getUpdatedAt() %></td>

@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="model.InquiryData" %>
+<%@ page import="util.HtmlUtil" %>
 
 <%
     InquiryData d = (InquiryData) request.getAttribute("detail");
@@ -39,9 +40,9 @@
     <h2>お問い合わせ詳細</h2>
 
     <p><b>ID:</b> <%= d.getId() %></p>
-    <p><b>カテゴリ:</b> <%= d.getCategoryName() %></p>
-    <p><b>メールアドレス:</b> <%= d.getEmail() %></p>
-    <p><b>内容:</b><br><%= d.getContent() %></p>
+    <p><b>カテゴリ:</b> <%= HtmlUtil.escape(d.getCategoryName()) %></p>
+    <p><b>メールアドレス:</b> <%= HtmlUtil.escape(d.getEmail()) %></p>
+    <p><b>内容:</b><br><%= HtmlUtil.escapeAndBr(d.getContent()) %></p>
     <p><b>ステータス:</b> <%= d.getStatus() %></p>
     
     <form action="status_update" method="post" style="margin-top:20px;">

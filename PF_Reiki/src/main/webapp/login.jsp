@@ -13,15 +13,15 @@
         margin: 0;
         height: 100vh;
         display: flex;
-        flex-direction: column;   
-        justify-content: center;  
-        align-items: center;       
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
 
     .login-container {
-        display: block;   
-        position: fixed;          
-        top: 20%;               
+        display: block;
+        position: fixed;
+        top: 20%;
         left: 50%;
         transform: translate(-50%, 0);
         background: white;
@@ -76,7 +76,6 @@
 <div id="loginBox" class="login-container">
     <form action="/PF_Reiki/login" method="post">
 
-    
         <div class="form-group">
             <label>ユーザーネーム</label>
             <input type="text" name="username" required>
@@ -93,35 +92,11 @@
     <div class="error">
         ${errorMessage}
     </div>
-    </div>
+
+    <br>
+    <a href="contact.jsp">お問い合わせはこちら</a>
 
 </div>
-
 
 </body>
 </html>
-<div id="loginBox" class="login-container">
-    <form action="/PF_Reiki/login" method="post">
-
-        <div class="form-group">
-            <label>ユーザーネーム</label>
-            <input type="text" name="username" required>
-        </div>
-
-        <div class="form-group">
-            <label>パスワード</label>
-            <input type="password" name="password" required>
-        </div>
-
-        <button type="submit">ログイン</button>
-    </form>
-
-    <div class="error">
-        ${errorMessage}
-    </div>
-
-    <!-- ★ここに移動する！ -->
-    <br>
-    <a href="contact.jsp">お問い合わせはこちら</a>
-    
-</div>

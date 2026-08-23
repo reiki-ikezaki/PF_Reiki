@@ -51,13 +51,15 @@
         font-weight: bold;
     }
 
-    input {
+    input, select, textarea {
         width: 100%;
         padding: 10px;
         margin-top: 5px;
         border: 1px solid #ccc;
         border-radius: 6px;
         font-size: 16px;
+        font-family: inherit;
+        box-sizing: border-box;
     }
 
     .submit-btn {
@@ -89,6 +91,15 @@
     .success {
         color: green;
     }
+
+    .back-link {
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
 </style>
 
 </head>
@@ -111,9 +122,29 @@
         <input type="password" name="password" placeholder="変更する場合のみ入力">
 
         <label>名前</label>
-        <input type="text" name="name" value="${user.name}">
+        <input type="text" name="name" value="${user.name}" maxlength="255">
 
-        <label>プロフィール画像（jpg/png/gif・2MB以下）</label>
+        <label>フリガナ（ひらがなのみ）</label>
+        <input type="text" name="furigana" value="${user.furigana}" maxlength="255">
+
+        <label>性別</label>
+        <select name="gender">
+            <option value="male"   ${user.gender == 'male' ? 'selected' : ''}>男性</option>
+            <option value="female" ${user.gender == 'female' ? 'selected' : ''}>女性</option>
+            <option value="other"  ${user.gender == 'other' ? 'selected' : ''}>その他</option>
+        </select>
+
+        <label>年齢</label>
+        <input type="number" name="age" value="${user.age}" min="0" max="999">
+
+        <label>自己紹介</label>
+        <textarea name="bio" rows="4" maxlength="1500">${user.bio}</textarea>
+
+        <label>プロフィール画像（jpg/png/gif・2MB以下）</label><br>
+        <img src="profileImage?id=${user.id}"
+             style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0;"
+             onerror="this.style.display='none';">
+        <br>
         <input type="file" name="profileImage" accept="image/*">
 
         <button type="submit" class="submit-btn">更新</button>
@@ -121,6 +152,10 @@
         <div class="msg error">${error}</div>
         <div class="msg success">${success}</div>
     </form>
+
+    <div style="text-align:center; margin-top:15px;">
+        <a href="${user.role == 'admin' ? 'adminDashboard' : 'userDashboard'}" class="back-link">← ダッシュボードに戻る</a>
+    </div>
 </div>
 
 <!-- ★ ファイル選択時に即エラー表示するスクリプト -->

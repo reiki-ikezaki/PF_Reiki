@@ -56,7 +56,39 @@
         font-weight: bold;
         color: #007bff;
     }
+
+    .like-btn {
+        background: #3498db; color: white; padding: 5px 10px;
+        border-radius: 4px; border: none; font-size: 13px; cursor: pointer;
+    }
+    .like-btn:disabled { background: #aaa; cursor: not-allowed; }
 </style>
+
+<script>
+async function sendLike(btn, targetUserId) {
+    btn.disabled = true;
+    try {
+        const res = await fetch("like", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: "targetUserId=" + encodeURIComponent(targetUserId)
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+            btn.textContent = data.message || "失敗";
+            btn.disabled = false;
+            return;
+        }
+
+        const countEl = document.getElementById("likeCount-" + targetUserId);
+        if (countEl) countEl.textContent = data.likeCount;
+
+    } catch (e) {
+        btn.disabled = false;
+    }
+}
+</script>
 </head>
 <body>
 
@@ -68,6 +100,7 @@
             <th>順位</th>
             <th>ユーザー名</th>
             <th>獲得いいね数</th>
+            <th>操作</th>
         </tr>
 
         <%
@@ -79,8 +112,12 @@
         %>
                     <tr>
                         <td class="rank"><%= index++ %></td>
-                        <td><%= item.getName() %></td>
-                        <td><%= item.getLikeCount() %></td>
+                        <td><a href="accountDetail?id=<%= item.getUserId() %>"><%= item.getName() %></a></td>
+                        <td id="likeCount-<%= item.getUserId() %>"><%= item.getLikeCount() %></td>
+                        <td>
+                            <button type="button" class="like-btn"
+                                    onclick="sendLike(this, <%= item.getUserId() %>)">いいね</button>
+                        </td>
                     </tr>
         <%
                 }

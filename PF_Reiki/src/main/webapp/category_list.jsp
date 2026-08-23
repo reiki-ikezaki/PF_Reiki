@@ -80,7 +80,7 @@
 <body>
 
 <div class="header">
-    <a class="back-btn" href="admin-dashboard.jsp">戻る</a>
+    <a class="back-btn" href="adminDashboard">戻る</a>
     <span>カテゴリ一覧</span>
     <form action="logout" method="post" class="logout-btn">
     <button type="submit">ログアウト</button>
@@ -111,7 +111,8 @@
             <td><%= cat.getName() %></td>
             <td>
                 <a class="btn" href="categoryEdit?id=<%= cat.getId() %>">編集</a>
-                <a class="btn btn-delete" href="categoryDelete?id=<%= cat.getId() %>">削除</a>
+                <a class="btn btn-delete" href="categoryDelete?id=<%= cat.getId() %>"
+                   onclick="return confirm('このカテゴリを削除します。よろしいですか？');">削除</a>
             </td>
         </tr>
         <%
