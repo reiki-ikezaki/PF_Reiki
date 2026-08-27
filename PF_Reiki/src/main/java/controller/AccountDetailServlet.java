@@ -12,7 +12,6 @@ import dao.LikeDao;
 import dao.UserDao;
 import model.UserData;
 
-// ▼ アカウント詳細（公開・いいね対象ユーザーのプロフィールを表示）
 @WebServlet("/accountDetail")
 public class AccountDetailServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

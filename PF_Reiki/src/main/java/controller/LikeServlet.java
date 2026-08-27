@@ -14,13 +14,11 @@ import dao.LikeDao;
 @WebServlet("/like")
 public class LikeServlet extends HttpServlet {
 
-    // ▼ 非同期いいね（fetchから呼ばれる）
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
         response.setContentType("application/json; charset=UTF-8");
 
-        // ▼ ログイン中ならセッションのユーザーIDを使い、未ログインなら匿名（0）としていいねを記録する
         HttpSession session = request.getSession(false);
         Object userIdObj = (session != null) ? session.getAttribute("userId") : null;
         int userId = (userIdObj != null) ? (Integer) userIdObj : 0;

@@ -8,29 +8,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.UserData;
+import util.PasswordUtil;
 
 public class UserDao {
 
-    // ▼ ログイン用
     public UserData findByLogin(String username, String password) {
         UserData user = null;
 
         try (Connection conn = DBManager.getConnection()) {
 
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+            String sql = "SELECT * FROM users WHERE username = ?";
             PreparedStatement pStmt = conn.prepareStatement(sql);
 
             pStmt.setString(1, username);
-            pStmt.setString(2, password);
 
             ResultSet rs = pStmt.executeQuery();
 
             if (rs.next()) {
+                String storedPassword = rs.getString("password");
+
+                if (!PasswordUtil.matches(password, storedPassword)) {
+                    return null;
+                }
+
+                int id = rs.getInt("id");
+
+                if (!PasswordUtil.isHashed(storedPassword)) {
+                    storedPassword = PasswordUtil.hash(password);
+                    rehashPassword(id, storedPassword);
+                }
+
                 user = new UserData();
-                user.setId(rs.getInt("id"));
+                user.setId(id);
                 user.setUsername(rs.getString("username"));
                 user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
+                user.setPassword(storedPassword);
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
@@ -49,12 +61,25 @@ public class UserDao {
         return user;
     }
 
-    // ▼ プロフィール編集
+    private void rehashPassword(int id, String newHash) {
+        String sql = "UPDATE users SET password = ? WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, newHash);
+            pstmt.setInt(2, id);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean updateUser(int id, String email, String password, String name) {
         return updateUser(id, email, password, name, null);
     }
 
-    // ▼ プロフィール編集（画像変更あり・BLOB保存）
     public boolean updateUser(int id, String email, String password, String name, byte[] imageBytes) {
         String sql = (imageBytes != null)
                 ? "UPDATE users SET email = ?, password = ?, name = ?, profile_image = ? WHERE id = ?"
@@ -65,7 +90,7 @@ public class UserDao {
 
             int i = 1;
             pStmt.setString(i++, email);
-            pStmt.setString(i++, password);
+            pStmt.setString(i++, PasswordUtil.hash(password));
             pStmt.setString(i++, name);
             if (imageBytes != null) {
                 pStmt.setBytes(i++, imageBytes);
@@ -82,7 +107,6 @@ public class UserDao {
         return false;
     }
 
-    // ▼ プロフィール編集（一般ユーザー自身用・フリガナ/性別/年齢/自己紹介も含めて更新）
     public boolean updateUser(int id, String email, String password, String name,
             String furigana, String gender, int age, String bio, byte[] imageBytes) {
 
@@ -97,7 +121,7 @@ public class UserDao {
 
             int i = 1;
             pStmt.setString(i++, email);
-            pStmt.setString(i++, password);
+            pStmt.setString(i++, PasswordUtil.hash(password));
             pStmt.setString(i++, name);
             pStmt.setString(i++, furigana);
             pStmt.setString(i++, gender);
@@ -118,8 +142,6 @@ public class UserDao {
         return false;
     }
 
-    // ▼ アカウント編集（管理者用・種別/ステータス/各項目まとめて更新）
-    //    password は null または空文字なら「変更しない」として扱う
     public boolean updateAccount(UserData user, String password, byte[] imageBytes) {
         boolean changePassword = password != null && !password.isEmpty();
 
@@ -148,7 +170,7 @@ public class UserDao {
             pstmt.setInt(i++, user.getAge());
             pstmt.setString(i++, user.getBio());
             if (changePassword) {
-                pstmt.setString(i++, password);
+                pstmt.setString(i++, PasswordUtil.hash(password));
             }
             if (imageBytes != null) {
                 pstmt.setBytes(i++, imageBytes);
@@ -165,7 +187,6 @@ public class UserDao {
         return false;
     }
 
-    // ▼ 全ユーザー一覧
     public List<UserData> findAll() {
         List<UserData> list = new ArrayList<>();
 
@@ -201,7 +222,6 @@ public class UserDao {
         return list;
     }
 
-    // ▼ ステータス切り替え
     public void toggleStatus(int userId) {
         String sql = "UPDATE users "
                    + "SET status = CASE "
@@ -220,7 +240,6 @@ public class UserDao {
         }
     }
 
-    // ▼ 論理削除
     public void logicalDelete(int id) {
         String sql = "UPDATE users SET status = 'deleted' WHERE id = ?";
 
@@ -235,7 +254,6 @@ public class UserDao {
         }
     }
 
-    // ▼ ID検索
     public UserData findById(int id) {
         UserData user = null;
 
@@ -270,7 +288,6 @@ public class UserDao {
         return user;
     }
 
-    // ▼ ページング
     public List<UserData> findPage(int offset, int limit) {
         List<UserData> list = new ArrayList<>();
 
@@ -309,7 +326,6 @@ public class UserDao {
         return list;
     }
 
-    // ▼ ユーザー数
     public int countUsers() {
         int count = 0;
 
@@ -330,7 +346,6 @@ public class UserDao {
         return count;
     }
 
- // ▼ アカウント追加（画像対応版）
     public boolean insertUser(UserData user, InputStream fileContent) {
 
         String sql = "INSERT INTO users "
@@ -342,12 +357,11 @@ public class UserDao {
 
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getEmail());
-            pstmt.setString(3, user.getPassword() != null ? user.getPassword() : "");
+            pstmt.setString(3, PasswordUtil.hash(user.getPassword()));
             pstmt.setString(4, user.getName());
             pstmt.setString(5, user.getRole());
             pstmt.setString(6, user.getStatus());
 
-            // ▼ 画像（BLOB）
             if (fileContent != null) {
                 pstmt.setBlob(7, fileContent);
             } else {
@@ -360,7 +374,7 @@ public class UserDao {
             pstmt.setString(11, user.getFurigana());
             pstmt.setString(12, user.getIntro());
 
-            
+
             int result = pstmt.executeUpdate();
             return result == 1;
 
@@ -372,7 +386,6 @@ public class UserDao {
     }
 
 
-    // ▼ プロフィール画像バイナリ取得（配信用）
     public byte[] getProfileImageBytes(int id) {
         String sql = "SELECT profile_image FROM users WHERE id = ?";
 
@@ -393,7 +406,6 @@ public class UserDao {
         return null;
     }
 
-    // ▼ 削除済みユーザー一覧
     public List<UserData> findDeletedUsers() {
         List<UserData> list = new ArrayList<>();
 
@@ -428,7 +440,6 @@ public class UserDao {
         return list;
     }
 
-    // ▼ 物理削除
     public void deleteUserPermanent(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
 
@@ -443,7 +454,6 @@ public class UserDao {
         }
     }
 
-    // ▼ 復活
     public void restoreAccount(int id) {
         String sql = "UPDATE users SET status = 'active' WHERE id = ?";
 
@@ -458,14 +468,10 @@ public class UserDao {
         }
     }
 
-    // ▼ 一般ユーザー一覧（公開画面）
     public List<UserData> getGeneralUserList() {
 
         List<UserData> list = new ArrayList<>();
 
-        // ▼ profile_image(BLOB)は一覧に不要なのでSELECTしない（画像は /profileImage?id= から個別取得）。
-        //    いいね数はGROUP BYではなく相関サブクエリで求める（BLOB列をGROUP BYに含めると
-        //    MySQLのソートメモリを使い果たすことがあるため）。
         String sql = "SELECT u.id, u.username, u.name, u.email, u.furigana, u.gender, u.age, u.bio, "
                    + "(SELECT COUNT(*) FROM likes l WHERE l.target_user_id = u.id) AS like_count "
                    + "FROM users u "

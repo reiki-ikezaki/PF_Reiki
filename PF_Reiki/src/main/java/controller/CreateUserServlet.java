@@ -26,13 +26,11 @@ public class CreateUserServlet extends HttpServlet {
         try {
             filePart = request.getPart("profileImage");
         } catch (Exception e) {
-            // ★ Tomcatの413例外（2MB超過）をキャッチしてフォームに戻す
             request.setAttribute("error", "プロフィール画像は2MB以下にしてください。");
             request.getRequestDispatcher("account-add.jsp").forward(request, response);
             return;
         }
 
-        // ▼ フォーム値
         String role = request.getParameter("role");
         String status = request.getParameter("status");
         String username = request.getParameter("username");
@@ -43,7 +41,6 @@ public class CreateUserServlet extends HttpServlet {
         String ageStr = request.getParameter("age");
         String bio = request.getParameter("bio");
 
-        // ▼ バリデーション
         String error = AccountValidator.validateName(name);
         if (error == null) error = AccountValidator.validateEmail(email);
         if (error == null) error = AccountValidator.validateFurigana(furigana);
@@ -70,7 +67,6 @@ public class CreateUserServlet extends HttpServlet {
             age = Integer.parseInt(ageStr);
         }
 
-        // ▼ UserData に詰める
         UserData user = new UserData();
         user.setRole(role);
         user.setStatus(status);
@@ -82,7 +78,6 @@ public class CreateUserServlet extends HttpServlet {
         user.setAge(age);
         user.setBio(bio);
 
-        // ▼ DB登録
         UserDao dao = new UserDao();
         boolean result = dao.insertUser(user, img);
 

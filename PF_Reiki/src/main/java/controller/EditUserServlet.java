@@ -46,12 +46,10 @@ public class EditUserServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         UserDao dao = new UserDao();
 
-        // ▼ 新しい画像が選択されていればバイト列を取得（未選択なら null＝画像は変更しない）
         Part filePart;
         try {
             filePart = request.getPart("profileImage");
         } catch (Exception e) {
-            // ★ Tomcatの413例外（2MB超過）をキャッチしてフォームに戻す
             request.setAttribute("error", "プロフィール画像は2MB以下にしてください。");
             request.setAttribute("user", dao.findById(id));
             request.getRequestDispatcher("edit-account.jsp").forward(request, response);
@@ -66,7 +64,6 @@ public class EditUserServlet extends HttpServlet {
         String ageStr = request.getParameter("age");
         String bio = request.getParameter("bio");
 
-        // ▼ バリデーション（パスワードは空欄なら変更なし扱い）
         String error = AccountValidator.validateName(name);
         if (error == null) error = AccountValidator.validateEmail(email);
         if (error == null) error = AccountValidator.validatePassword(password);

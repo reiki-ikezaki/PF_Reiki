@@ -19,12 +19,10 @@ public class PublicTopServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 一般ユーザー一覧
         UserDao userDao = new UserDao();
         List<UserData> users = userDao.getGeneralUserList();
 
 
-        // いいねランキング
         LikeDao likeDao = new LikeDao();
         List<UserData> ranking = likeDao.getRanking();
 

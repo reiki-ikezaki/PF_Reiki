@@ -16,9 +16,10 @@ import jakarta.servlet.http.Part;
 import dao.UserDao;
 import model.UserData;
 import util.AccountValidator;
+import util.PasswordUtil;
 
 @WebServlet("/profileEdit")
-@MultipartConfig(maxFileSize = 1024 * 1024 * 2) // ★ 2MB制限
+@MultipartConfig(maxFileSize = 1024 * 1024 * 2)
 public class ProfileEditServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -33,15 +34,12 @@ public class ProfileEditServlet extends HttpServlet {
         byte[] imageBytes = null;
 
         try {
-            // ▼ 画像ファイル取得
             Part part = request.getPart("profileImage");
 
             if (part != null && part.getSize() > 0) {
 
-                // ▼ ファイル名取得（小文字化して拡張子判定）
                 String submittedName = part.getSubmittedFileName().toLowerCase();
 
-                // ▼ 拡張子チェック（画像のみ許可）
                 if (!(submittedName.endsWith(".jpg") ||
                       submittedName.endsWith(".jpeg") ||
                       submittedName.endsWith(".png") ||
@@ -52,14 +50,12 @@ public class ProfileEditServlet extends HttpServlet {
                     return;
                 }
 
-                // ▼ 2MBチェック
                 if (part.getSize() > 1024 * 1024 * 2) {
                     request.setAttribute("error", "画像は2MB以下にしてください。");
                     forward(request, response);
                     return;
                 }
 
-                // ▼ DB（BLOB）に保存するためバイト列として読み込む
                 try (InputStream in = part.getInputStream();
                      ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                     byte[] buf = new byte[8192];
@@ -72,13 +68,11 @@ public class ProfileEditServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-            // ★ Tomcatの413例外をキャッチして JSP に戻す
             request.setAttribute("error", "画像は2MB以下にしてください。");
             forward(request, response);
             return;
         }
 
-        // ▼ 以下はあなたの元コードそのまま
         String email = request.getParameter("email");
         String password = request.getParameter("password");
         String name = request.getParameter("name");
@@ -111,7 +105,6 @@ public class ProfileEditServlet extends HttpServlet {
             return;
         }
 
-        // ▼ フリガナ/性別/年齢/自己紹介のバリデーション
         String error = AccountValidator.validateFurigana(furigana);
         if (error == null) error = AccountValidator.validateGender(gender);
         if (error == null) error = AccountValidator.validateAge(ageStr);
@@ -139,7 +132,7 @@ public class ProfileEditServlet extends HttpServlet {
         }
 
         user.setEmail(email);
-        user.setPassword(password);
+        user.setPassword(PasswordUtil.hash(password));
         user.setName(name);
         user.setFurigana(furigana);
         user.setGender(gender);

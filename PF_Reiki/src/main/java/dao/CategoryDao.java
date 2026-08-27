@@ -11,7 +11,6 @@ import model.Category;
 
 public class CategoryDao {
 
-    // ▼ カテゴリ一覧取得
     public List<Category> findAll() {
         List<Category> list = new ArrayList<>();
         String sql = "SELECT * FROM categories ORDER BY id";
@@ -34,7 +33,6 @@ public class CategoryDao {
         return list;
     }
 
-    // ▼ ID でカテゴリ取得
     public Category findById(int id) {
         Category c = null;
         String sql = "SELECT * FROM categories WHERE id = ?";
@@ -58,7 +56,6 @@ public class CategoryDao {
         return c;
     }
 
-    // ▼ カテゴリ追加
     public boolean insert(String name) {
         String sql = "INSERT INTO categories (name) VALUES (?)";
 
@@ -75,7 +72,6 @@ public class CategoryDao {
         return false;
     }
 
-    // ▼ カテゴリ更新
     public boolean update(int id, String name) {
         String sql = "UPDATE categories SET name = ? WHERE id = ?";
 
@@ -93,7 +89,6 @@ public class CategoryDao {
         return false;
     }
 
-    // ▼ カテゴリ削除
     public void delete(int id) {
         String sql = "DELETE FROM categories WHERE id = ?";
 

@@ -23,9 +23,9 @@ public class RestoreAccountServlet extends HttpServlet {
             int userId = Integer.parseInt(idStr);
 
             UserDao dao = new UserDao();
-            dao.restoreAccount(userId);  // 
+            dao.restoreAccount(userId);
         }
-        
+
         response.sendRedirect("deleteAccountList");
     }
 }

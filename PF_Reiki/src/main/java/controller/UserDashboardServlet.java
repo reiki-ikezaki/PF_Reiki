@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import dao.LikeDao;   // ★ 必須
+import dao.LikeDao;
 
 @WebServlet("/userDashboard")
 public class UserDashboardServlet extends HttpServlet {

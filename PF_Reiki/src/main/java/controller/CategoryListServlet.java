@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dao.CategoryDao;
-import model.Category;   
+import model.Category;
 
 @WebServlet("/categoryList")
 public class CategoryListServlet extends HttpServlet {
@@ -19,14 +19,11 @@ public class CategoryListServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // DAO 呼び出し
         CategoryDao dao = new CategoryDao();
         List<Category> categoryList = dao.findAll();
 
-        // JSP に渡す
         request.setAttribute("categoryList", categoryList);
 
-        // 画面遷移
         request.getRequestDispatcher("category_list.jsp").forward(request, response);
     }
 }

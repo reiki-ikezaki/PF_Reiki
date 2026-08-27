@@ -19,7 +19,6 @@ public class AdminDashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // ▼ いいねランキング（今年・上位のみダッシュボードに表示）
         LikeDao likeDao = new LikeDao();
         List<LikeRanking> rankingList = likeDao.getLikeRankingThisYear();
 

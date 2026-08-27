@@ -16,7 +16,6 @@ public class UserData {
     private String furigana;
     private String intro;
 
-    // ★ LikeDao 用（ランキング表示）
     private int likeCount;
 
     public int getId() { return id; }
@@ -58,7 +57,6 @@ public class UserData {
     public String getIntro() { return intro; }
     public void setIntro(String intro) { this.intro = intro; }
 
-    // ★ LikeDao 用
     public int getLikeCount() { return likeCount; }
     public void setLikeCount(int likeCount) { this.likeCount = likeCount; }
 }

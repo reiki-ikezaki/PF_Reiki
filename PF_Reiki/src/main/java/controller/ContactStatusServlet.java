@@ -23,7 +23,6 @@ public class ContactStatusServlet extends HttpServlet {
         InquiryDao dao = new InquiryDao();
         dao.insertInquiry(categoryId, content, email);
 
-        // ★ 完了画面へ移動
         response.sendRedirect("contact_success.jsp");
     }
 }

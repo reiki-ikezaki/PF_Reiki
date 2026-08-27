@@ -11,7 +11,6 @@ import model.UserData;
 
 public class LikeDao {
 
-    // ▼ いいね登録
     public void addLike(int userId) {
 
         String sql = "INSERT INTO likes (user_id, created_at) VALUES (?, NOW())";
@@ -27,13 +26,10 @@ public class LikeDao {
         }
     }
 
-    // ▼ 年間ランキング（LikeRanking 用）
     public List<LikeRanking> getLikeRankingThisYear() {
 
         List<LikeRanking> list = new ArrayList<>();
 
-        // ▼ target_user_id = 「いいねされた側」。いいねを送った回数(user_id)ではなく
-        //    獲得したいいね数(target_user_id)を集計する。
         String sql = "SELECT u.id AS id, u.name AS name, "
                    + "COUNT(l.id) AS like_count "
                    + "FROM users u "
@@ -63,7 +59,6 @@ public class LikeDao {
         return list;
     }
 
-    // ▼ 月間ランキング（LikeRanking 用）
     public List<LikeRanking> getLikeRankingThisMonth() {
 
         List<LikeRanking> list = new ArrayList<>();
@@ -98,7 +93,6 @@ public class LikeDao {
         return list;
     }
 
-    // ▼ 公開画面ランキング（UserData 用）
     public List<UserData> getRanking() {
 
         List<UserData> list = new ArrayList<>();
@@ -119,7 +113,7 @@ public class LikeDao {
                 UserData u = new UserData();
                 u.setId(rs.getInt("id"));
                 u.setName(rs.getString("name"));
-                u.setLikeCount(rs.getInt("like_count")); // ★ UserData に追加済み
+                u.setLikeCount(rs.getInt("like_count"));
                 list.add(u);
             }
 
@@ -129,7 +123,6 @@ public class LikeDao {
 
         return list;
     }
- // ▼ 今月のいいね数
     public int countLikesThisMonth(int userId) {
         String sql = "SELECT COUNT(*) FROM likes "
                    + "WHERE target_user_id = ? "
@@ -152,7 +145,6 @@ public class LikeDao {
         return 0;
     }
 
-    // ▼ 今年のいいね数
     public int countLikesThisYear(int userId) {
         String sql = "SELECT COUNT(*) FROM likes "
                    + "WHERE target_user_id = ? "
@@ -173,7 +165,6 @@ public class LikeDao {
         }
         return 0;
     }
-    // ▼ 通算の獲得いいね数（アカウント詳細・非同期更新用）
     public int countLikesTotal(int targetUserId) {
         String sql = "SELECT COUNT(*) FROM likes WHERE target_user_id = ?";
 
@@ -193,7 +184,6 @@ public class LikeDao {
         return 0;
     }
 
- // ▼ いいね登録（userId が targetUserId にいいねする）
     public boolean insertLike(int userId, int targetUserId) {
 
         String sql = "INSERT INTO likes (user_id, target_user_id, created_at) VALUES (?, ?, NOW())";
