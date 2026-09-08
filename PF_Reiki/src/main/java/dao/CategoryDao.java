@@ -13,7 +13,7 @@ public class CategoryDao {
 
     public List<Category> findAll() {
         List<Category> list = new ArrayList<>();
-        String sql = "SELECT * FROM categories ORDER BY id";
+        String sql = "SELECT * FROM categories WHERE deleted_at IS NULL ORDER BY id";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -23,6 +23,8 @@ public class CategoryDao {
                 Category c = new Category();
                 c.setId(rs.getInt("id"));
                 c.setName(rs.getString("name"));
+                c.setCreatedAt(rs.getTimestamp("created_at"));
+                c.setUpdatedAt(rs.getTimestamp("updated_at"));
                 list.add(c);
             }
 
@@ -47,6 +49,8 @@ public class CategoryDao {
                 c = new Category();
                 c.setId(rs.getInt("id"));
                 c.setName(rs.getString("name"));
+                c.setCreatedAt(rs.getTimestamp("created_at"));
+                c.setUpdatedAt(rs.getTimestamp("updated_at"));
             }
 
         } catch (Exception e) {
@@ -101,5 +105,58 @@ public class CategoryDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void logicalDelete(int id) {
+        String sql = "UPDATE categories SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void restore(int id) {
+        String sql = "UPDATE categories SET deleted_at = NULL WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<Category> findDeleted() {
+        List<Category> list = new ArrayList<>();
+        String sql = "SELECT * FROM categories WHERE deleted_at IS NOT NULL ORDER BY id";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                Category c = new Category();
+                c.setId(rs.getInt("id"));
+                c.setName(rs.getString("name"));
+                c.setCreatedAt(rs.getTimestamp("created_at"));
+                c.setUpdatedAt(rs.getTimestamp("updated_at"));
+                c.setDeletedAt(rs.getTimestamp("deleted_at"));
+                list.add(c);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

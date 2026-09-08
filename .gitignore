@@ -1,0 +1,2 @@
+# メール送信の認証情報（Gitに含めない）
+PF_Reiki/src/main/webapp/WEB-INF/mail.properties

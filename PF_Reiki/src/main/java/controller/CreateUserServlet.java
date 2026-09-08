@@ -16,7 +16,7 @@ import model.UserData;
 import util.AccountValidator;
 
 @WebServlet("/CreateUserServlet")
-@MultipartConfig(maxFileSize = 1024 * 1024 * 2)
+@MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class CreateUserServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -36,6 +36,7 @@ public class CreateUserServlet extends HttpServlet {
         String username = request.getParameter("username");
         String email = request.getParameter("email");
         String name = request.getParameter("name");
+        String password = request.getParameter("password");
         String furigana = request.getParameter("furigana");
         String gender = request.getParameter("gender");
         String ageStr = request.getParameter("age");
@@ -43,12 +44,19 @@ public class CreateUserServlet extends HttpServlet {
 
         String error = AccountValidator.validateName(name);
         if (error == null) error = AccountValidator.validateEmail(email);
+        if (error == null && (password == null || password.isEmpty())) {
+            error = "パスワードを入力してください。";
+        }
+        if (error == null) error = AccountValidator.validatePassword(password);
         if (error == null) error = AccountValidator.validateFurigana(furigana);
         if (error == null) error = AccountValidator.validateGender(gender);
         if (error == null) error = AccountValidator.validateAge(ageStr);
         if (error == null) error = AccountValidator.validateBio(bio);
-        if (error == null && filePart != null) {
-            error = AccountValidator.validateImageSize(filePart.getSize());
+        if (error == null && filePart != null && filePart.getSize() > 0) {
+            error = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
+            if (error == null) {
+                error = AccountValidator.validateImageSize(filePart.getSize());
+            }
         }
 
         if (error != null) {
@@ -72,6 +80,7 @@ public class CreateUserServlet extends HttpServlet {
         user.setStatus(status);
         user.setUsername(username);
         user.setEmail(email);
+        user.setPassword(password);
         user.setName(name);
         user.setFurigana(furigana);
         user.setGender(gender);

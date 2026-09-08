@@ -101,4 +101,16 @@ public class AccountValidator {
         }
         return null;
     }
+
+    public static String validateImageExtension(String filename) {
+        if (filename == null) {
+            return "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+        }
+        String lower = filename.toLowerCase();
+        if (!(lower.endsWith(".jpg") || lower.endsWith(".jpeg")
+                || lower.endsWith(".png") || lower.endsWith(".gif"))) {
+            return "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+        }
+        return null;
+    }
 }

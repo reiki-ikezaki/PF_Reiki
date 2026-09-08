@@ -10,8 +10,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import dao.CategoryDao;
 
-@WebServlet("/categoryDelete")
-public class CategoryDeleteServlet extends HttpServlet {
+@WebServlet("/categoryDeletePermanent")
+public class CategoryDeletePermanentServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -23,9 +23,9 @@ public class CategoryDeleteServlet extends HttpServlet {
             int id = Integer.parseInt(idStr);
 
             CategoryDao dao = new CategoryDao();
-            dao.logicalDelete(id);
+            dao.delete(id);
         }
 
-        response.sendRedirect("categoryList");
+        response.sendRedirect("categoryDeletedList");
     }
 }

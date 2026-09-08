@@ -8,8 +8,9 @@ public class InquiryData {
     private String content;
     private String email;
     private String status;
-    private String createdAt;  
-    private String updatedAt;  
+    private String createdAt;
+    private String updatedAt;
+    private String deletedAt;
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -34,4 +35,7 @@ public class InquiryData {
 
     public String getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(String updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(String deletedAt) { this.deletedAt = deletedAt; }
 }

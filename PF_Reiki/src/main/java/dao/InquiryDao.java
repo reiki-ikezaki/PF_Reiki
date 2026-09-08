@@ -25,6 +25,7 @@ public class InquiryDao {
                    + "i.updated_at "
                    + "FROM inquiries i "
                    + "JOIN categories c ON i.category_id = c.id "
+                   + "WHERE i.deleted_at IS NULL "
                    + "ORDER BY i.id DESC";
 
         try (Connection con = DBManager.getConnection();
@@ -132,5 +133,69 @@ public class InquiryDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void logicalDelete(int id) {
+        String sql = "UPDATE inquiries SET deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void restore(int id) {
+        String sql = "UPDATE inquiries SET deleted_at = NULL WHERE id = ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, id);
+            pstmt.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public List<InquiryData> findDeleted() {
+        List<InquiryData> list = new ArrayList<>();
+
+        String sql = "SELECT i.id, i.category_id, c.name AS categoryName, i.content, i.email, "
+                   + "i.status, i.created_at, i.updated_at, i.deleted_at "
+                   + "FROM inquiries i "
+                   + "JOIN categories c ON i.category_id = c.id "
+                   + "WHERE i.deleted_at IS NOT NULL "
+                   + "ORDER BY i.id DESC";
+
+        try (Connection con = DBManager.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                InquiryData data = new InquiryData();
+
+                data.setId(rs.getInt("id"));
+                data.setCategoryId(rs.getInt("category_id"));
+                data.setCategoryName(rs.getString("categoryName"));
+                data.setContent(rs.getString("content"));
+                data.setEmail(rs.getString("email"));
+                data.setStatus(rs.getString("status"));
+                data.setCreatedAt(rs.getString("created_at"));
+                data.setUpdatedAt(rs.getString("updated_at"));
+                data.setDeletedAt(rs.getString("deleted_at"));
+                list.add(data);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
     }
 }

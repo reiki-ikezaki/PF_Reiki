@@ -8,6 +8,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>一般ユーザー一覧</title>
 
 <style>
@@ -18,11 +19,25 @@
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
     h2 { text-align: center; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; }
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; min-width: 700px; border-collapse: collapse; }
     th, td { padding: 10px; border-bottom: 1px solid #ddd; }
     th { background: #007bff; color: white; }
-    .back-link { display: inline-block; margin-bottom: 15px; color: #007bff; text-decoration: none; }
-    .detail-link { color: #3498db; text-decoration: none; }
+    .back-link {
+        display: inline-block; margin-bottom: 15px;
+        background: #007bff; color: white;
+        padding: 8px 16px; border-radius: 6px;
+        text-decoration: none; font-weight: bold;
+    }
+    .back-link:hover { background: #0056b3; }
+    .detail-link {
+        display: inline-block;
+        background: #3498db; color: white;
+        padding: 6px 12px; border-radius: 4px;
+        text-decoration: none;
+    }
+    .detail-link:hover { background: #2980b9; }
+
 </style>
 </head>
 <body>
@@ -31,6 +46,7 @@
     <a class="back-link" href="adminDashboard">← 管理者ダッシュボードに戻る</a>
     <h2>一般ユーザー一覧</h2>
 
+    <div class="table-scroll">
     <table>
         <tr>
             <th>ID</th>
@@ -60,13 +76,14 @@
             <td><%= HtmlUtil.genderLabel(u.getGender()) %></td>
             <td><%= u.getAge() %></td>
             <td><%= u.getBio() %></td>
-            <td><a class="detail-link" href="accountDetail?id=<%= u.getId() %>">詳細</a></td>
+            <td><a class="detail-link" href="accountDetail?id=<%= u.getId() %>&from=general-list">詳細</a></td>
         </tr>
         <%
                 }
             }
         %>
     </table>
+    </div>
 </div>
 
 </body>

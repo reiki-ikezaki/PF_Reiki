@@ -6,6 +6,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>管理者ダッシュボード</title>
 
 <style>
@@ -17,9 +18,9 @@
     }
 
     .logout-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 16px 0;
     }
 
     .logout-btn button {
@@ -33,9 +34,9 @@
     }
 
     .container {
-        width: 80%;
+        width: 90%;
         max-width: 900px;
-        margin: 80px auto;
+        margin: 24px auto;
         background: white;
         padding: 30px;
         border-radius: 10px;
@@ -49,12 +50,14 @@
 
     .menu {
         margin-top: 30px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
     }
 
     .menu a {
-        display: inline-block;
-        margin: 10px 20px;
-        padding: 10px 20px;
+        display: block;
+        padding: 12px 10px;
         background: #007bff;
         color: white;
         text-decoration: none;
@@ -71,6 +74,18 @@
         background: #f0f0f0;
         border-radius: 8px;
         text-align: left;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .menu {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 </head>
@@ -99,6 +114,30 @@
             <%
                     }
                     if (shown == 0) {
+            %>
+                <li>まだいいねがありません</li>
+            <%
+                    }
+                }
+            %>
+        </ul>
+    </div>
+
+    <div class="likes-box">
+        <h2>いいねランキング（今月・上位5件）</h2>
+        <ul>
+            <%
+                List<LikeRanking> monthlyRankingList = (List<LikeRanking>) request.getAttribute("monthlyRankingList");
+                if (monthlyRankingList != null) {
+                    int shownMonthly = 0;
+                    for (LikeRanking r : monthlyRankingList) {
+                        if (shownMonthly >= 5) break;
+                        shownMonthly++;
+            %>
+                <li><%= r.getName() %> → <%= r.getLikeCount() %>いいね</li>
+            <%
+                    }
+                    if (shownMonthly == 0) {
             %>
                 <li>まだいいねがありません</li>
             <%

@@ -4,14 +4,20 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ログイン</title>
 
 <style>
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: Arial, sans-serif;
         background: #f5f5f5;
         margin: 0;
-        height: 100vh;
+        min-height: 100vh;
+        padding: 24px 16px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -20,13 +26,10 @@
 
     .login-container {
         display: block;
-        position: fixed;
-        top: 20%;
-        left: 50%;
-        transform: translate(-50%, 0);
         background: white;
-        padding: 20px;
-        width: 300px;
+        padding: 24px;
+        width: 320px;
+        max-width: 100%;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
@@ -42,10 +45,18 @@
     }
 
     input {
+        display: block;
         width: 100%;
         padding: 10px;
         border: 1px solid #ccc;
         border-radius: 5px;
+        font-size: 16px;
+    }
+
+    /* ブラウザ標準の「目」「×」アイコンが右端に重なって表示崩れするのを抑止 */
+    input::-ms-reveal,
+    input::-ms-clear {
+        display: none;
     }
 
     button {
@@ -67,6 +78,21 @@
         color: red;
         text-align: center;
         margin-top: 10px;
+    }
+
+    .contact-link {
+        display: inline-block;
+        margin-top: 10px;
+        background: #aaa;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .contact-link:hover {
+        background: #888;
     }
 </style>
 
@@ -94,7 +120,7 @@
     </div>
 
     <br>
-    <a href="contact.jsp">お問い合わせはこちら</a>
+    <a href="contact" class="contact-link">お問い合わせはこちら</a>
 
 </div>
 

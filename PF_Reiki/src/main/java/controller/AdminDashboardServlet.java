@@ -21,8 +21,10 @@ public class AdminDashboardServlet extends HttpServlet {
 
         LikeDao likeDao = new LikeDao();
         List<LikeRanking> rankingList = likeDao.getLikeRankingThisYear();
+        List<LikeRanking> monthlyRankingList = likeDao.getLikeRankingThisMonth();
 
         request.setAttribute("rankingList", rankingList);
+        request.setAttribute("monthlyRankingList", monthlyRankingList);
 
         request.getRequestDispatcher("admin-dashboard.jsp").forward(request, response);
     }

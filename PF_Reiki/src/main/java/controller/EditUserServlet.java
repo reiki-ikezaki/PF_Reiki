@@ -17,7 +17,7 @@ import model.UserData;
 import util.AccountValidator;
 
 @WebServlet("/editUser")
-@MultipartConfig(maxFileSize = 1024 * 1024 * 2)
+@MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class EditUserServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -71,8 +71,11 @@ public class EditUserServlet extends HttpServlet {
         if (error == null) error = AccountValidator.validateGender(gender);
         if (error == null) error = AccountValidator.validateAge(ageStr);
         if (error == null) error = AccountValidator.validateBio(bio);
-        if (error == null && filePart != null) {
-            error = AccountValidator.validateImageSize(filePart.getSize());
+        if (error == null && filePart != null && filePart.getSize() > 0) {
+            error = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
+            if (error == null) {
+                error = AccountValidator.validateImageSize(filePart.getSize());
+            }
         }
 
         if (error != null) {

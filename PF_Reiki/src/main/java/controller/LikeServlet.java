@@ -34,7 +34,16 @@ public class LikeServlet extends HttpServlet {
 
         LikeDao dao = new LikeDao();
         boolean success = dao.insertLike(userId, targetUserId);
-        int likeCount = dao.countLikesTotal(targetUserId);
+
+        String scope = request.getParameter("scope");
+        int likeCount;
+        if ("monthly".equals(scope)) {
+            likeCount = dao.countLikesThisMonth(targetUserId);
+        } else if ("year".equals(scope)) {
+            likeCount = dao.countLikesThisYear(targetUserId);
+        } else {
+            likeCount = dao.countLikesTotal(targetUserId);
+        }
 
         response.getWriter().write(
                 "{\"success\": " + success + ", \"likeCount\": " + likeCount + "}");

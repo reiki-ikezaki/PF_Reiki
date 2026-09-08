@@ -2,11 +2,13 @@
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="model.UserData" %>
+<%@ page import="util.HtmlUtil" %>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>アカウント一覧</title>
 
 <style>
@@ -33,7 +35,9 @@
 
     .top-menu {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
+        gap: 10px;
         margin-bottom: 20px;
     }
 
@@ -60,20 +64,45 @@
     }
 
     .back-link {
-        color: #007bff;
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
         text-decoration: none;
+        font-weight: bold;
         align-self: center;
     }
 
     .back-link:hover {
+        background: #0056b3;
+    }
+
+    .page-link {
+        color: #007bff;
+        text-decoration: none;
+        margin: 0 6px;
+    }
+
+    .page-link:hover {
         text-decoration: underline;
+    }
+
+    .page-link.disabled {
+        color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .table-scroll {
+        overflow-x: auto;
+        margin-top: 20px;
     }
 
     table {
         width: 100%;
+        min-width: 800px;
         border-collapse: collapse;
         table-layout: fixed;
-        margin-top: 20px;
     }
 
     table th, table td {
@@ -102,23 +131,26 @@
 
     .btn {
         display: inline-block;
-        min-width: 84px;
+        min-width: 60px;
         padding: 6px 12px;
         border-radius: 4px;
         text-decoration: none;
         color: white;
         font-size: 14px;
         text-align: center;
-        white-space: nowrap;
+        white-space: normal;
+        word-break: break-word;
     }
 
     .edit { background: #28a745; }
     .ban { background: #ff9800; }
     .delete { background: #dc3545; }
 
+    th:last-child,
     td:last-child {
-        width: 220px;
+        width: 120px;
     }
+
 </style>
 </head>
 <body>
@@ -137,6 +169,7 @@
 
     <h1>アカウント一覧</h1>
 
+    <div class="table-scroll">
     <table>
         <tr>
             <th>ユーザー名</th>
@@ -144,6 +177,8 @@
             <th>名前</th>
             <th>権限</th>
             <th>ステータス</th>
+            <th>作成日</th>
+            <th>更新日</th>
             <th>画像</th>
             <th>操作</th>
         </tr>
@@ -159,7 +194,9 @@
             <td><%= u.getEmail() %></td>
             <td><%= u.getName() %></td>
             <td><%= u.getRole() %></td>
-            <td><%= u.getStatus() %></td>
+            <td><%= HtmlUtil.statusLabel(u.getStatus()) %></td>
+            <td><%= HtmlUtil.formatDateTime(u.getCreatedAt()) %></td>
+            <td><%= HtmlUtil.formatDateTime(u.getUpdatedAt()) %></td>
 
             <!-- ★ 画像列（貼るだけで完成する強化版） -->
             <td>
@@ -200,6 +237,7 @@
         %>
 
     </table>
+    </div>
 
     <!-- ▼▼▼ ページネーション ▼▼▼ -->
     <div class="pagination" style="text-align:center; margin-top:20px;">
@@ -210,23 +248,23 @@
         %>
 
         <% if (currentPage > 1) { %>
-            <a href="accountList?page=<%= currentPage - 1 %>">前へ</a>
+            <a href="accountList?page=<%= currentPage - 1 %>" class="page-link">前へ</a>
         <% } else { %>
-            <span style="color:#ccc;">前へ</span>
+            <span class="page-link disabled">前へ</span>
         <% } %>
 
         <% for (int i = 1; i <= totalPages; i++) { %>
             <% if (i == currentPage) { %>
-                <strong>[<%= i %>]</strong>
+                <span class="page-link disabled">[<%= i %>]</span>
             <% } else { %>
-                <a href="accountList?page=<%= i %>">[<%= i %>]</a>
+                <a href="accountList?page=<%= i %>" class="page-link">[<%= i %>]</a>
             <% } %>
         <% } %>
 
         <% if (currentPage < totalPages) { %>
-            <a href="accountList?page=<%= currentPage + 1 %>">次へ</a>
+            <a href="accountList?page=<%= currentPage + 1 %>" class="page-link">次へ</a>
         <% } else { %>
-            <span style="color:#ccc;">次へ</span>
+            <span class="page-link disabled">次へ</span>
         <% } %>
 
     </div>

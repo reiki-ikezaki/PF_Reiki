@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List" %>
-<%@ page import="model.Category" %>
+<%@ page import="model.InquiryData" %>
 <%@ page import="util.HtmlUtil" %>
 
 <!DOCTYPE html>
@@ -8,7 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>カテゴリ一覧</title>
+<title>削除済みお問い合わせ一覧</title>
 
 <style>
     body {
@@ -37,14 +37,8 @@
         flex-wrap: wrap;
         justify-content: space-between;
         align-items: center;
+        gap: 10px;
         margin-bottom: 20px;
-        gap: 10px;
-    }
-
-    .top-menu-left {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
     }
 
     .logout-form {
@@ -79,7 +73,7 @@
 
     table {
         width: 100%;
-        min-width: 600px;
+        min-width: 700px;
         border-collapse: collapse;
         table-layout: fixed;
     }
@@ -120,8 +114,8 @@
         white-space: nowrap;
     }
 
-    .edit { background: #28a745; }
     .delete { background: #dc3545; }
+    .restore { background: #28a745; }
 
 </style>
 
@@ -131,44 +125,45 @@
 <div class="container">
 
     <div class="top-menu">
-        <div class="top-menu-left">
-            <a href="adminDashboard" class="btn">← 管理者ダッシュボードに戻る</a>
-            <a href="categoryAdd" class="btn">カテゴリ追加</a>
-            <a href="categoryDeletedList" class="btn">削除済みカテゴリ一覧</a>
-        </div>
+        <a href="contact_list" class="btn">← お問い合わせ一覧に戻る</a>
 
         <form action="logout" method="post" class="logout-form">
             <button type="submit" class="logout-btn">ログアウト</button>
         </form>
     </div>
 
-    <h1>カテゴリ一覧</h1>
+    <h1>削除済みお問い合わせ一覧</h1>
 
     <div class="table-scroll">
     <table>
         <tr>
-            <th>ID</th>
-            <th>カテゴリ名</th>
-            <th>作成日</th>
-            <th>更新日</th>
+            <th>カテゴリ</th>
+            <th>メールアドレス</th>
+            <th>お問い合わせ内容</th>
+            <th>削除日</th>
             <th>操作</th>
         </tr>
 
         <%
-            List<Category> list = (List<Category>) request.getAttribute("categoryList");
+            List<InquiryData> list = (List<InquiryData>) request.getAttribute("deletedList");
             if (list != null) {
-                for (Category cat : list) {
+                for (InquiryData ing : list) {
+        %>
+        <%
+            String content = ing.getContent();
+            String preview = (content == null) ? "" :
+                (content.length() > 10 ? content.substring(0, 10) + "…" : content);
         %>
         <tr>
-            <td><%= cat.getId() %></td>
-            <td><%= HtmlUtil.escape(cat.getName()) %></td>
-            <td><%= HtmlUtil.formatDateTime(cat.getCreatedAt()) %></td>
-            <td><%= HtmlUtil.formatDateTime(cat.getUpdatedAt()) %></td>
+            <td><%= HtmlUtil.escape(ing.getCategoryName()) %></td>
+            <td><%= HtmlUtil.escape(ing.getEmail()) %></td>
+            <td><%= HtmlUtil.escape(preview) %></td>
+            <td><%= ing.getDeletedAt() %></td>
             <td>
                 <div class="actions">
-                    <a class="action-btn edit" href="categoryEdit?id=<%= cat.getId() %>">編集</a>
-                    <a class="action-btn delete" href="categoryDelete?id=<%= cat.getId() %>"
-                       onclick="return confirm('このカテゴリを削除します。よろしいですか？');">削除</a>
+                    <a class="action-btn delete" href="contact_destroy?id=<%= ing.getId() %>"
+                       onclick="return confirm('このお問い合わせを完全に削除します。この操作は取り消せません。よろしいですか？');">完全削除</a>
+                    <a class="action-btn restore" href="contact_restore?id=<%= ing.getId() %>">復活</a>
                 </div>
             </td>
         </tr>

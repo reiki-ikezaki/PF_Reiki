@@ -8,6 +8,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>いいねランキング</title>
 
 <style>
@@ -32,8 +33,11 @@
         margin-bottom: 30px;
     }
 
+    .table-scroll { overflow-x: auto; }
+
     table {
         width: 100%;
+        min-width: 500px;
         border-collapse: collapse;
     }
 
@@ -62,6 +66,25 @@
         border-radius: 4px; border: none; font-size: 13px; cursor: pointer;
     }
     .like-btn:disabled { background: #aaa; cursor: not-allowed; }
+
+    .name-link {
+        color: #3498db;
+        text-decoration: none;
+    }
+    .name-link:hover { text-decoration: underline; }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 15px;
+        background: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+    .back-link:hover { background: #0056b3; }
+
 </style>
 
 <script>
@@ -71,7 +94,7 @@ async function sendLike(btn, targetUserId) {
         const res = await fetch("like", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: "targetUserId=" + encodeURIComponent(targetUserId)
+            body: "targetUserId=" + encodeURIComponent(targetUserId) + "&scope=year"
         });
         const data = await res.json();
 
@@ -93,8 +116,10 @@ async function sendLike(btn, targetUserId) {
 <body>
 
 <div class="container">
+    <a class="back-link" href="adminDashboard">← 管理者ダッシュボードに戻る</a>
     <h2>❤️ いいねランキング ❤️</h2>
 
+    <div class="table-scroll">
     <table>
         <tr>
             <th>順位</th>
@@ -112,7 +137,7 @@ async function sendLike(btn, targetUserId) {
         %>
                     <tr>
                         <td class="rank"><%= index++ %></td>
-                        <td><a href="accountDetail?id=<%= item.getUserId() %>"><%= item.getName() %></a></td>
+                        <td><a class="name-link" href="accountDetail?id=<%= item.getUserId() %>&from=ranking"><%= item.getName() %></a></td>
                         <td id="likeCount-<%= item.getUserId() %>"><%= item.getLikeCount() %></td>
                         <td>
                             <button type="button" class="like-btn"
@@ -125,6 +150,7 @@ async function sendLike(btn, targetUserId) {
         %>
 
     </table>
+    </div>
 </div>
 
 </body>

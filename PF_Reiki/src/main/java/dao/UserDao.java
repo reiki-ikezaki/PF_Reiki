@@ -52,6 +52,9 @@ public class UserDao {
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
                 user.setIntro(rs.getString("intro"));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                user.setDeletedAt(rs.getTimestamp("deleted_at"));
             }
 
         } catch (Exception e) {
@@ -110,23 +113,31 @@ public class UserDao {
     public boolean updateUser(int id, String email, String password, String name,
             String furigana, String gender, int age, String bio, byte[] imageBytes) {
 
-        String sql = (imageBytes != null)
-                ? "UPDATE users SET email = ?, password = ?, name = ?, furigana = ?, "
-                        + "gender = ?, age = ?, bio = ?, profile_image = ? WHERE id = ?"
-                : "UPDATE users SET email = ?, password = ?, name = ?, furigana = ?, "
-                        + "gender = ?, age = ?, bio = ? WHERE id = ?";
+        boolean changePassword = password != null && !password.isEmpty();
+
+        StringBuilder sql = new StringBuilder(
+                "UPDATE users SET email = ?, name = ?, furigana = ?, gender = ?, age = ?, bio = ?");
+        if (changePassword) {
+            sql.append(", password = ?");
+        }
+        if (imageBytes != null) {
+            sql.append(", profile_image = ?");
+        }
+        sql.append(" WHERE id = ?");
 
         try (Connection conn = DBManager.getConnection();
-             PreparedStatement pStmt = conn.prepareStatement(sql)) {
+             PreparedStatement pStmt = conn.prepareStatement(sql.toString())) {
 
             int i = 1;
             pStmt.setString(i++, email);
-            pStmt.setString(i++, PasswordUtil.hash(password));
             pStmt.setString(i++, name);
             pStmt.setString(i++, furigana);
             pStmt.setString(i++, gender);
             pStmt.setInt(i++, age);
             pStmt.setString(i++, bio);
+            if (changePassword) {
+                pStmt.setString(i++, PasswordUtil.hash(password));
+            }
             if (imageBytes != null) {
                 pStmt.setBytes(i++, imageBytes);
             }
@@ -212,6 +223,9 @@ public class UserDao {
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
                 user.setIntro(rs.getString("intro"));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                user.setDeletedAt(rs.getTimestamp("deleted_at"));
                 list.add(user);
             }
 
@@ -241,7 +255,7 @@ public class UserDao {
     }
 
     public void logicalDelete(int id) {
-        String sql = "UPDATE users SET status = 'deleted' WHERE id = ?";
+        String sql = "UPDATE users SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP WHERE id = ?";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -280,6 +294,9 @@ public class UserDao {
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
                 user.setIntro(rs.getString("intro"));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                user.setDeletedAt(rs.getTimestamp("deleted_at"));
             }
 
         } catch (Exception e) {
@@ -316,6 +333,9 @@ public class UserDao {
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
                 user.setIntro(rs.getString("intro"));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                user.setDeletedAt(rs.getTimestamp("deleted_at"));
                 list.add(user);
             }
 
@@ -430,6 +450,9 @@ public class UserDao {
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
                 user.setIntro(rs.getString("intro"));
+                user.setCreatedAt(rs.getTimestamp("created_at"));
+                user.setUpdatedAt(rs.getTimestamp("updated_at"));
+                user.setDeletedAt(rs.getTimestamp("deleted_at"));
                 list.add(user);
             }
 
@@ -455,7 +478,7 @@ public class UserDao {
     }
 
     public void restoreAccount(int id) {
-        String sql = "UPDATE users SET status = 'active' WHERE id = ?";
+        String sql = "UPDATE users SET status = 'active', deleted_at = NULL WHERE id = ?";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -473,7 +496,9 @@ public class UserDao {
         List<UserData> list = new ArrayList<>();
 
         String sql = "SELECT u.id, u.username, u.name, u.email, u.furigana, u.gender, u.age, u.bio, "
-                   + "(SELECT COUNT(*) FROM likes l WHERE l.target_user_id = u.id) AS like_count "
+                   + "(SELECT COUNT(*) FROM likes l WHERE l.target_user_id = u.id "
+                   + "AND YEAR(l.created_at) = YEAR(CURDATE()) AND MONTH(l.created_at) = MONTH(CURDATE())) "
+                   + "AS like_count "
                    + "FROM users u "
                    + "WHERE u.role = 'user' AND u.status != 'deleted' "
                    + "ORDER BY u.id";

@@ -4,9 +4,14 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>プロフィール編集</title>
 
 <style>
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: Arial, sans-serif;
         background: #f5f5f5;
@@ -15,9 +20,9 @@
     }
 
     .logout-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+        display: flex;
+        justify-content: flex-end;
+        padding: 10px 16px 0;
     }
 
     .logout-btn button {
@@ -31,13 +36,20 @@
     }
 
     .container {
-        width: 80%;
+        width: 90%;
         max-width: 500px;
-        margin: 60px auto;
+        margin: 24px auto 40px;
         background: white;
         padding: 30px;
         border-radius: 10px;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            width: 92%;
+            padding: 20px;
+        }
     }
 
     h1 {
@@ -60,6 +72,10 @@
         font-size: 16px;
         font-family: inherit;
         box-sizing: border-box;
+    }
+
+    textarea {
+        resize: none;
     }
 
     .submit-btn {
@@ -93,12 +109,17 @@
     }
 
     .back-link {
-        color: #007bff;
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
         text-decoration: none;
+        font-weight: bold;
     }
 
     .back-link:hover {
-        text-decoration: underline;
+        background: #0056b3;
     }
 </style>
 
@@ -122,10 +143,10 @@
         <input type="password" name="password" placeholder="変更する場合のみ入力">
 
         <label>名前</label>
-        <input type="text" name="name" value="${user.name}" maxlength="255">
+        <input type="text" name="name" value="${user.name}">
 
         <label>フリガナ（ひらがなのみ）</label>
-        <input type="text" name="furigana" value="${user.furigana}" maxlength="255">
+        <input type="text" name="furigana" value="${user.furigana}">
 
         <label>性別</label>
         <select name="gender">
@@ -138,7 +159,7 @@
         <input type="number" name="age" value="${user.age}" min="0" max="999">
 
         <label>自己紹介</label>
-        <textarea name="bio" rows="4" maxlength="1500">${user.bio}</textarea>
+        <textarea name="bio" rows="4">${user.bio}</textarea>
 
         <label>プロフィール画像（jpg/png/gif・2MB以下）</label><br>
         <img src="profileImage?id=${user.id}"
@@ -158,7 +179,7 @@
     </div>
 </div>
 
-<!-- ★ ファイル選択時に即エラー表示するスクリプト -->
+<!-- ファイル選択時に即エラー表示するスクリプト -->
 <script>
 document.querySelector("input[name='profileImage']").addEventListener("change", function(e) {
     const file = e.target.files[0];

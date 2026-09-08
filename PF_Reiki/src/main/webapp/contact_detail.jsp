@@ -10,15 +10,22 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>お問い合わせ詳細</title>
 
 <style>
-    body { font-family: Arial; background: #f5f5f5; padding: 20px; }
+    * { box-sizing: border-box; }
+    body { font-family: Arial; background: #f5f5f5; padding: 16px; margin: 0; }
+    select, button, input { font-size: 16px; }
+    select { padding: 8px; border: 1px solid #ccc; border-radius: 5px; max-width: 100%; }
+    form button { padding: 8px 16px; border: none; border-radius: 5px; background: #007bff; color: white; cursor: pointer; }
+    p { word-break: break-word; }
     .box {
         background: white;
         padding: 20px;
         border-radius: 8px;
         width: 600px;
+        max-width: 100%;
         margin: auto;
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }

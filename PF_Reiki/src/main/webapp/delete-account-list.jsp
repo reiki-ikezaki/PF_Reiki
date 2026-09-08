@@ -2,11 +2,13 @@
     pageEncoding="UTF-8"%>
 <%@ page import="java.util.List" %>
 <%@ page import="model.UserData" %>
+<%@ page import="util.HtmlUtil" %>
 
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>削除済みアカウント一覧</title>
 
 <style>
@@ -31,11 +33,16 @@
         margin-bottom: 20px;
     }
 
+    .table-scroll {
+        overflow-x: auto;
+        margin-top: 20px;
+    }
+
     table {
         width: 100%;
+        min-width: 600px;
         border-collapse: collapse;
         table-layout: fixed;
-        margin-top: 20px;
     }
 
     table th, table td {
@@ -70,13 +77,18 @@
     .back-link {
         margin-top: 20px;
         display: inline-block;
-        color: #007bff;
+        background: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
         text-decoration: none;
+        font-weight: bold;
     }
 
     .back-link:hover {
-        text-decoration: underline;
+        background: #0056b3;
     }
+
 </style>
 </head>
 <body>
@@ -85,11 +97,13 @@
 
     <h1>削除済みアカウント一覧</h1>
 
+    <div class="table-scroll">
     <table>
         <tr>
             <th>名前</th>
             <th>メールアドレス</th>
             <th>ステータス</th>
+            <th>削除日</th>
             <th>完全削除</th>
             <th>復活</th>
         </tr>
@@ -103,7 +117,8 @@
         <tr>
             <td><%= u.getName() %></td>
             <td><%= u.getEmail() %></td>
-            <td><%= u.getStatus() %></td>
+            <td><%= HtmlUtil.statusLabel(u.getStatus()) %></td>
+            <td><%= HtmlUtil.formatDateTime(u.getDeletedAt()) %></td>
 
             <td>
                 <a href="deleteUserPermanent?id=<%= u.getId() %>" class="btn delete"
@@ -120,6 +135,7 @@
         %>
 
     </table>
+    </div>
 
     <a href="accountList" class="back-link">アカウント一覧に戻る</a>
 

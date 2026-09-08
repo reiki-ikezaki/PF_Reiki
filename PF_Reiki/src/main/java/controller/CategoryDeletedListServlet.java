@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -9,23 +10,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dao.CategoryDao;
+import model.Category;
 
-@WebServlet("/categoryDelete")
-public class CategoryDeleteServlet extends HttpServlet {
+@WebServlet("/categoryDeletedList")
+public class CategoryDeletedListServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String idStr = request.getParameter("id");
+        CategoryDao dao = new CategoryDao();
+        List<Category> deletedList = dao.findDeleted();
 
-        if (idStr != null) {
-            int id = Integer.parseInt(idStr);
+        request.setAttribute("deletedList", deletedList);
 
-            CategoryDao dao = new CategoryDao();
-            dao.logicalDelete(id);
-        }
-
-        response.sendRedirect("categoryList");
+        request.getRequestDispatcher("category_deleted_list.jsp").forward(request, response);
     }
 }

@@ -7,6 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import dao.LikeDao;
 import dao.UserDao;
@@ -36,11 +37,29 @@ public class AccountDetailServlet extends HttpServlet {
         }
 
         LikeDao likeDao = new LikeDao();
-        int likeCount = likeDao.countLikesTotal(id);
+        int likeCount = likeDao.countLikesThisMonth(id);
 
         request.setAttribute("detailUser", user);
         request.setAttribute("likeCount", likeCount);
+        request.setAttribute("backUrl", resolveBackUrl(request));
 
         request.getRequestDispatcher("account-detail.jsp").forward(request, response);
+    }
+
+    private String resolveBackUrl(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        boolean loggedIn = session != null && session.getAttribute("userId") != null;
+
+        if (loggedIn) {
+            String from = request.getParameter("from");
+            if ("ranking".equals(from)) {
+                return "ranking";
+            }
+            if ("general-list".equals(from)) {
+                return "generalList";
+            }
+        }
+
+        return "public_top";
     }
 }

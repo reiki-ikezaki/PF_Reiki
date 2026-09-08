@@ -7,94 +7,144 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>お問い合わせ一覧</title>
 
 <style>
     body {
-        margin: 0;
         font-family: Arial, sans-serif;
         background: #f5f5f5;
+        margin: 0;
+        padding: 0;
     }
 
-    .header {
-        background: #2c3e50;
-        color: white;
-        padding: 12px 20px;
-        display: flex;
-        align-items: center;
-    }
-
-    .back-btn {
-        background: #3498db;
-        color: white;
-        padding: 8px 14px;
-        border-radius: 4px;
-        text-decoration: none;
-        margin-right: 20px;
-    }
-
-    .logout {
-        margin-left: auto;
-        background: #e67e22;
-        padding: 8px 14px;
-        border-radius: 4px;
-        color: white;
-        text-decoration: none;
-    }
-
-    .main {
+    .container {
+        width: 90%;
+        margin: 40px auto;
+        background: white;
         padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .top-menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    .top-menu-left {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .logout-form {
+        margin: 0;
+    }
+
+    .logout-btn {
+        background: #333;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .btn {
+        display: inline-block;
+        background: #007bff;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .btn:hover { background: #0056b3; }
+
+    .table-scroll {
+        overflow-x: auto;
+        margin-top: 20px;
     }
 
     table {
         width: 100%;
+        min-width: 800px;
         border-collapse: collapse;
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
+        table-layout: fixed;
     }
 
-    th, td {
+    table th, table td {
+        border: 1px solid #999;
         padding: 12px;
-        border-bottom: 1px solid #ddd;
-        text-align: left;
+        text-align: center;
+        word-wrap: break-word;
     }
 
-    th {
-        background: #ecf0f1;
-    }
-
-    .btn {
-        padding: 6px 12px;
-        background: #3498db;
+    table th {
+        background: #007bff;
         color: white;
+        font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+        background: #f2f2f2;
+    }
+
+    .actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .action-btn {
+        display: inline-block;
+        min-width: 60px;
+        padding: 6px 12px;
         border-radius: 4px;
         text-decoration: none;
+        color: white;
+        font-size: 14px;
+        text-align: center;
+        white-space: nowrap;
     }
 
-    .btn-delete {
-        background: #e74c3c;
-    }
+    .detail { background: #28a745; }
+    .delete { background: #dc3545; }
+
 </style>
 
 </head>
 <body>
 
-<div class="header">
-    <a class="back-btn" href="adminDashboard">戻る</a>
-    <span>お問い合わせ一覧</span>
-    <form action="logout" method="post" class="logout-btn">
-    <button type="submit">ログアウト</button>
-</form>
+<div class="container">
 
-</div>
+    <div class="top-menu">
+        <div class="top-menu-left">
+            <a href="adminDashboard" class="btn">← 管理者ダッシュボードに戻る</a>
+            <a href="categoryList" class="btn">カテゴリ一覧</a>
+            <a href="contact_deleted_list" class="btn">削除済みお問い合わせ一覧</a>
+        </div>
 
-<div class="main">
+        <form action="logout" method="post" class="logout-form">
+            <button type="submit" class="logout-btn">ログアウト</button>
+        </form>
+    </div>
 
-    <!-- ▼ 追加したカテゴリ一覧ボタン -->
-    <a class="btn" href="categoryList">カテゴリ一覧</a>
-    <br><br>
+    <h1>お問い合わせ一覧</h1>
 
+    <div class="table-scroll">
     <table>
         <tr>
             <th>カテゴリ</th>
@@ -124,9 +174,11 @@
             <td><%= ing.getCreatedAt() %></td>
             <td><%= ing.getUpdatedAt() %></td>
             <td>
-                <a class="btn" href="contact_detail?id=<%= ing.getId() %>">詳細</a>
-                <a class="btn btn-delete" href="contact_destroy?id=<%= ing.getId() %>">削除</a>
-                
+                <div class="actions">
+                    <a class="action-btn detail" href="contact_detail?id=<%= ing.getId() %>">詳細</a>
+                    <a class="action-btn delete" href="contact_delete?id=<%= ing.getId() %>"
+                       onclick="return confirm('このお問い合わせを削除します。よろしいですか？');">削除</a>
+                </div>
             </td>
         </tr>
         <%
@@ -134,6 +186,7 @@
             }
         %>
     </table>
+    </div>
 
 </div>
 

@@ -19,7 +19,7 @@ import util.AccountValidator;
 import util.PasswordUtil;
 
 @WebServlet("/profileEdit")
-@MultipartConfig(maxFileSize = 1024 * 1024 * 2)
+@MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class ProfileEditServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
@@ -87,13 +87,7 @@ public class ProfileEditServlet extends HttpServlet {
             return;
         }
 
-        if (password == null || password.isEmpty()) {
-            request.setAttribute("error", "パスワードを入力してください。");
-            forward(request, response);
-            return;
-        }
-
-        if (!isValidPassword(password)) {
+        if (password != null && !password.isEmpty() && !isValidPassword(password)) {
             request.setAttribute("error", "パスワードは8〜32文字の半角英数字と _ - のみ使用できます。");
             forward(request, response);
             return;
@@ -132,7 +126,9 @@ public class ProfileEditServlet extends HttpServlet {
         }
 
         user.setEmail(email);
-        user.setPassword(PasswordUtil.hash(password));
+        if (password != null && !password.isEmpty()) {
+            user.setPassword(PasswordUtil.hash(password));
+        }
         user.setName(name);
         user.setFurigana(furigana);
         user.setGender(gender);

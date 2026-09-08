@@ -1,0 +1,10 @@
+# このファイルを mail.properties にコピーして値を設定してください。
+# mail.properties は .gitignore で除外されているためコミットされません。
+#
+# smtp.appPassword は Gmail の「アプリパスワード」（16文字）を指定してください。
+# 通常のログインパスワードではありません。発行方法:
+# https://myaccount.google.com/apppasswords
+
+smtp.user=your-account@gmail.com
+smtp.appPassword=xxxxxxxxxxxxxxxx
+notify.to=your-account@gmail.com
