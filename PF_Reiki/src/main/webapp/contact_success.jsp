@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%-- お問い合わせ送信完了画面。ContactStatusServlet#doPost のリダイレクト先。表示のみ（処理なし） --%>
 <!DOCTYPE html>
 <html>
 <head>

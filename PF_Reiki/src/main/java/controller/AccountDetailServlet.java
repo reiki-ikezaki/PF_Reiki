@@ -49,17 +49,16 @@ public class AccountDetailServlet extends HttpServlet {
     private String resolveBackUrl(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         boolean loggedIn = session != null && session.getAttribute("userId") != null;
+        String from = request.getParameter("from");
 
-        if (loggedIn) {
-            String from = request.getParameter("from");
-            if ("ranking".equals(from)) {
-                return "ranking";
-            }
-            if ("general-list".equals(from)) {
-                return "generalList";
-            }
+        String backUrl;
+        if (loggedIn && "ranking".equals(from)) {
+            backUrl = "ranking";
+        } else if (loggedIn && "general-list".equals(from)) {
+            backUrl = "generalList";
+        } else {
+            backUrl = "public_top";
         }
-
-        return "public_top";
+        return backUrl;
     }
 }

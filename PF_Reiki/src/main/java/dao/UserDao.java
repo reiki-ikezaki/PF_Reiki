@@ -51,7 +51,6 @@ public class UserDao {
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
-                user.setIntro(rs.getString("intro"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
                 user.setDeletedAt(rs.getTimestamp("deleted_at"));
@@ -77,37 +76,6 @@ public class UserDao {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public boolean updateUser(int id, String email, String password, String name) {
-        return updateUser(id, email, password, name, null);
-    }
-
-    public boolean updateUser(int id, String email, String password, String name, byte[] imageBytes) {
-        String sql = (imageBytes != null)
-                ? "UPDATE users SET email = ?, password = ?, name = ?, profile_image = ? WHERE id = ?"
-                : "UPDATE users SET email = ?, password = ?, name = ? WHERE id = ?";
-
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement pStmt = conn.prepareStatement(sql)) {
-
-            int i = 1;
-            pStmt.setString(i++, email);
-            pStmt.setString(i++, PasswordUtil.hash(password));
-            pStmt.setString(i++, name);
-            if (imageBytes != null) {
-                pStmt.setBytes(i++, imageBytes);
-            }
-            pStmt.setInt(i++, id);
-
-            int result = pStmt.executeUpdate();
-            return result == 1;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 
     public boolean updateUser(int id, String email, String password, String name,
@@ -198,44 +166,6 @@ public class UserDao {
         return false;
     }
 
-    public List<UserData> findAll() {
-        List<UserData> list = new ArrayList<>();
-
-        try (Connection conn = DBManager.getConnection()) {
-
-            String sql = "SELECT * FROM users WHERE status != 'deleted' ORDER BY id";
-            PreparedStatement pStmt = conn.prepareStatement(sql);
-
-            ResultSet rs = pStmt.executeQuery();
-
-            while (rs.next()) {
-                UserData user = new UserData();
-                user.setId(rs.getInt("id"));
-                user.setUsername(rs.getString("username"));
-                user.setEmail(rs.getString("email"));
-                user.setPassword(rs.getString("password"));
-                user.setName(rs.getString("name"));
-                user.setRole(rs.getString("role"));
-                user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image"));
-                user.setBio(rs.getString("bio"));
-                user.setAge(rs.getInt("age"));
-                user.setGender(rs.getString("gender"));
-                user.setFurigana(rs.getString("furigana"));
-                user.setIntro(rs.getString("intro"));
-                user.setCreatedAt(rs.getTimestamp("created_at"));
-                user.setUpdatedAt(rs.getTimestamp("updated_at"));
-                user.setDeletedAt(rs.getTimestamp("deleted_at"));
-                list.add(user);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
     public void toggleStatus(int userId) {
         String sql = "UPDATE users "
                    + "SET status = CASE "
@@ -293,7 +223,6 @@ public class UserDao {
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
-                user.setIntro(rs.getString("intro"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
                 user.setDeletedAt(rs.getTimestamp("deleted_at"));
@@ -332,7 +261,6 @@ public class UserDao {
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
-                user.setIntro(rs.getString("intro"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
                 user.setDeletedAt(rs.getTimestamp("deleted_at"));
@@ -369,8 +297,8 @@ public class UserDao {
     public boolean insertUser(UserData user, InputStream fileContent) {
 
         String sql = "INSERT INTO users "
-                + "(username, email, password, name, role, status, profile_image, bio, age, gender, furigana, intro) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "(username, email, password, name, role, status, profile_image, bio, age, gender, furigana) "
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -392,8 +320,6 @@ public class UserDao {
             pstmt.setInt(9, user.getAge());
             pstmt.setString(10, user.getGender());
             pstmt.setString(11, user.getFurigana());
-            pstmt.setString(12, user.getIntro());
-
 
             int result = pstmt.executeUpdate();
             return result == 1;
@@ -449,7 +375,6 @@ public class UserDao {
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
                 user.setFurigana(rs.getString("furigana"));
-                user.setIntro(rs.getString("intro"));
                 user.setCreatedAt(rs.getTimestamp("created_at"));
                 user.setUpdatedAt(rs.getTimestamp("updated_at"));
                 user.setDeletedAt(rs.getTimestamp("deleted_at"));

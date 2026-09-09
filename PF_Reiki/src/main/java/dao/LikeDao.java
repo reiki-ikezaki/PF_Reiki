@@ -7,24 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import model.LikeRanking;
-import model.UserData;
 
 public class LikeDao {
-
-    public void addLike(int userId) {
-
-        String sql = "INSERT INTO likes (user_id, created_at) VALUES (?, NOW())";
-
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setInt(1, userId);
-            pstmt.executeUpdate();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     public List<LikeRanking> getLikeRankingThisYear() {
 
@@ -93,36 +77,6 @@ public class LikeDao {
         return list;
     }
 
-    public List<UserData> getRanking() {
-
-        List<UserData> list = new ArrayList<>();
-
-        String sql = "SELECT u.id, u.name, "
-                   + "COUNT(l.id) AS like_count "
-                   + "FROM users u "
-                   + "LEFT JOIN likes l ON u.id = l.target_user_id "
-                   + "WHERE u.status != 'deleted' "
-                   + "GROUP BY u.id, u.name "
-                   + "ORDER BY like_count DESC";
-
-        try (Connection conn = DBManager.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-
-            while (rs.next()) {
-                UserData u = new UserData();
-                u.setId(rs.getInt("id"));
-                u.setName(rs.getString("name"));
-                u.setLikeCount(rs.getInt("like_count"));
-                list.add(u);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
     public int countLikesThisMonth(int userId) {
         String sql = "SELECT COUNT(*) FROM likes "
                    + "WHERE target_user_id = ? "

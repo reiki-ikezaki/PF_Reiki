@@ -103,6 +103,8 @@ public class InquiryDao {
         }
     }
 
+    // お問い合わせを1件登録する。
+    // ステータスは画面から選ばせず、SQL内で固定文字列 '未対応' を入れる。
     public void insertInquiry(int categoryId, String content, String email) {
         String sql =
             "INSERT INTO inquiries (category_id, content, email, status) " +
@@ -111,12 +113,13 @@ public class InquiryDao {
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setInt(1, categoryId);
-            pstmt.setString(2, content);
-            pstmt.setString(3, email);
-            pstmt.executeUpdate();
+            pstmt.setInt(1, categoryId);   // どのカテゴリか
+            pstmt.setString(2, content);   // 本文
+            pstmt.setString(3, email);     // 返信先メール
+            pstmt.executeUpdate();         // 1件INSERT
 
         } catch (Exception e) {
+            // 失敗しても例外は投げ返さない（呼び出し側では成功扱いになる点は要改善）
             e.printStackTrace();
         }
     }

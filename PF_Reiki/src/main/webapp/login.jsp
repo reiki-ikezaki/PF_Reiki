@@ -69,11 +69,6 @@
         cursor: pointer;
     }
 
-    .close-btn {
-        background: #aaa;
-        margin-top: 10px;
-    }
-
     .error {
         color: red;
         text-align: center;

@@ -14,7 +14,6 @@ public class UserData {
     private int age;
     private String gender;
     private String furigana;
-    private String intro;
 
     private java.sql.Timestamp createdAt;
     private java.sql.Timestamp updatedAt;
@@ -57,9 +56,6 @@ public class UserData {
 
     public String getFurigana() { return furigana; }
     public void setFurigana(String furigana) { this.furigana = furigana; }
-
-    public String getIntro() { return intro; }
-    public void setIntro(String intro) { this.intro = intro; }
 
     public int getLikeCount() { return likeCount; }
     public void setLikeCount(int likeCount) { this.likeCount = likeCount; }
