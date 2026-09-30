@@ -166,7 +166,7 @@ function toggleRole() {
         <label>名前</label>
         <input type="text" name="name" required>
 
-        <label>パスワード（半角英数字と _ - で8〜32文字）</label>
+        <label>パスワード（半角英数字（英字・数字を両方含む）と _ - で8〜32文字）</label>
         <input type="password" name="password" autocomplete="new-password" required>
 
         <label>プロフィール画像（jpg / jpeg / png / gif・2MB以下）</label>

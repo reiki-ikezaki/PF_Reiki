@@ -47,8 +47,8 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        if (!password.matches("^[a-zA-Z0-9_-]{8,32}$")) {
-            request.setAttribute("errorMessage", "パスワードは8〜32文字の半角英数字と _ - のみ使用できます");
+        if (!password.matches("^(?=.*[a-zA-Z])(?=.*[0-9])[a-zA-Z0-9_-]{8,32}$")) {
+            request.setAttribute("errorMessage", "パスワードは8〜32文字の半角英数字（英字・数字を両方含む）と _ - のみ使用できます");
             request.getRequestDispatcher("login.jsp").forward(request, response);
             return;
         }

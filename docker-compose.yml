@@ -1,0 +1,49 @@
+services:
+
+  # ── データベース（MySQL） ─────────────────────────
+  db:
+    image: mysql:8.4
+    container_name: pf_reiki_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: myapp_db
+      TZ: Asia/Tokyo
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      # 初回起動時だけ実行される初期化SQL（テーブル作成＋初期データ投入）
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # ── アプリ（Tomcat + PF_Reiki） ───────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pf_reiki_app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db          # docker-compose内ではサービス名がホスト名になる
+      DB_PORT: "3306"
+      DB_NAME: myapp_db
+      DB_USER: root
+      DB_PASSWORD: root
+    ports:
+      - "8080:8080"
+    # お問い合わせの通知メールを使う場合は、
+    # PF_Reiki/src/main/webapp/WEB-INF/mail.properties を作成してから
+    # 下のvolumesのコメントを外してください（.gitignore対象なのでリポジトリには含まれません）。
+    # volumes:
+    #   - ./PF_Reiki/src/main/webapp/WEB-INF/mail.properties:/usr/local/tomcat/webapps/PF_Reiki/WEB-INF/mail.properties:ro
+
+volumes:
+  db_data:

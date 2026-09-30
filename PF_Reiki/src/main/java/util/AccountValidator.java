@@ -13,8 +13,9 @@ public class AccountValidator {
     private static final Pattern AGE_PATTERN =
             Pattern.compile("^[0-9]{1,3}$");
 
+    // 英字1文字以上・数字1文字以上を必須にする（英字のみ／数字のみは不可）
     private static final Pattern PASSWORD_PATTERN =
-            Pattern.compile("^[A-Za-z0-9_-]{8,32}$");
+            Pattern.compile("^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9_-]{8,32}$");
 
     private AccountValidator() {
     }
@@ -90,7 +91,7 @@ public class AccountValidator {
             return null;
         }
         if (!PASSWORD_PATTERN.matcher(password).matches()) {
-            return "パスワードは8〜32文字の半角英数字と _ - のみ使用できます。";
+            return "パスワードは8〜32文字の半角英数字（英字・数字を両方含む）と _ - のみ使用できます。";
         }
         return null;
     }

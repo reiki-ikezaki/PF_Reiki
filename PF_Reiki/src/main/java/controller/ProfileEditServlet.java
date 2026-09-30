@@ -88,7 +88,7 @@ public class ProfileEditServlet extends HttpServlet {
         }
 
         if (password != null && !password.isEmpty() && !isValidPassword(password)) {
-            request.setAttribute("error", "パスワードは8〜32文字の半角英数字と _ - のみ使用できます。");
+            request.setAttribute("error", "パスワードは8〜32文字の半角英数字（英字・数字を両方含む）と _ - のみ使用できます。");
             forward(request, response);
             return;
         }
@@ -157,7 +157,8 @@ public class ProfileEditServlet extends HttpServlet {
         if (pass == null) return false;
         if (pass.length() < 8 || pass.length() > 32) return false;
 
-        String regex = "^[A-Za-z0-9_-]+$";
+        // 英字1文字以上・数字1文字以上を必須にする（英字のみ／数字のみは不可）
+        String regex = "^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9_-]+$";
         return pass.matches(regex);
     }
 

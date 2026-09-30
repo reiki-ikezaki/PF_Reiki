@@ -173,7 +173,7 @@ function toggleRole() {
         <label>名前</label>
         <input type="text" name="name" value="${user.name}">
 
-        <label>パスワード（変更する場合のみ入力・半角英数字と _ - で8〜32文字）</label>
+        <label>パスワード（変更する場合のみ入力・半角英数字（英字・数字を両方含む）と _ - で8〜32文字）</label>
         <input type="password" name="password" placeholder="変更する場合のみ入力" autocomplete="new-password">
 
         <label>プロフィール画像</label>
