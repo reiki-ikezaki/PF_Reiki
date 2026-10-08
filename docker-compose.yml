@@ -2,9 +2,13 @@ services:
 
   # ── データベース（MySQL） ─────────────────────────
   db:
-    image: mysql:8.4
+    # サーバーに既にある mysql:8.0 のイメージを再利用してディスクを節約する
+    image: mysql:8.0
     container_name: pf_reiki_db
     restart: unless-stopped
+    # 共有サーバーのメモリが少ないため、使用量に上限を付けて軽量設定にする
+    mem_limit: 450m
+    command: ["--performance-schema=OFF", "--innodb-buffer-pool-size=64M", "--max-connections=30"]
     environment:
       # パスワードは同じフォルダの .env の DB_PASSWORD で指定できる（未指定なら root）
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
@@ -28,10 +32,13 @@ services:
       dockerfile: Dockerfile
     container_name: pf_reiki_app
     restart: unless-stopped
+    # 共有サーバーのメモリが少ないため、使用量に上限を付ける
+    mem_limit: 450m
     depends_on:
       db:
         condition: service_healthy
     environment:
+      CATALINA_OPTS: "-Xms64m -Xmx256m -XX:MaxMetaspaceSize=128m"
       DB_HOST: db          # docker-compose内ではサービス名がホスト名になる
       DB_PORT: "3306"
       DB_NAME: myapp_db
