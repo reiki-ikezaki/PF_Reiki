@@ -15,7 +15,7 @@ public class DBManager {
 
     private static final String URL =
         "jdbc:mysql://" + HOST + ":" + PORT + "/" + DB_NAME
-            + "?useSSL=false&characterEncoding=UTF-8&serverTimezone=Asia/Tokyo";
+            + "?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=Asia/Tokyo";
 
     private static String env(String key, String defaultValue) {
         String value = System.getenv(key);
