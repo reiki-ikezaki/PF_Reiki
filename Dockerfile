@@ -38,10 +38,10 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 # 配置先フォルダ名（＝コンテキストパス）をこれに合わせる必要がある。
 COPY --from=build /workspace/webapp /usr/local/tomcat/webapps/PF_Reiki
 
-# 指定のURL（http://<サーバー>:9156/）を開いたとき、ログイン画面へ自動で転送する
+# 指定のURL（http://<サーバー>:9156/）を開いたとき、公開トップ画面へ自動で転送する
 # （アプリ本体は /PF_Reiki 配下にあるため、"/" だけだと 404 になってしまうのを防ぐ）
 RUN mkdir -p /usr/local/tomcat/webapps/ROOT && \
-    printf '%s' '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0; url=/PF_Reiki/login"><title>PF_Reiki</title></head><body><a href="/PF_Reiki/login">ログイン画面へ</a></body></html>' \
+    printf '%s' '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0; url=/PF_Reiki/public_top"><title>PF_Reiki</title></head><body><a href="/PF_Reiki/public_top">トップ画面へ</a></body></html>' \
       > /usr/local/tomcat/webapps/ROOT/index.html
 
 EXPOSE 8080
