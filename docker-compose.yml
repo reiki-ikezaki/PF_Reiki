@@ -6,17 +6,17 @@ services:
     container_name: pf_reiki_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      # パスワードは同じフォルダの .env の DB_PASSWORD で指定できる（未指定なら root）
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_DATABASE: myapp_db
       TZ: Asia/Tokyo
-    ports:
-      - "3306:3306"
+    # DBのポートは外部に公開しない（appコンテナからだけ db:3306 でつながる）
     volumes:
       - db_data:/var/lib/mysql
       # 初回起動時だけ実行される初期化SQL（テーブル作成＋初期データ投入）
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -36,9 +36,10 @@ services:
       DB_PORT: "3306"
       DB_NAME: myapp_db
       DB_USER: root
-      DB_PASSWORD: root
+      DB_PASSWORD: ${DB_PASSWORD:-root}
     ports:
-      - "8080:8080"
+      # 左：外から見えるポート（サーバーの指定は 9156）／右：コンテナ内のTomcat（8080のまま）
+      - "9156:8080"
     # お問い合わせの通知メールを使う場合は、
     # PF_Reiki/src/main/webapp/WEB-INF/mail.properties を作成してから
     # 下のvolumesのコメントを外してください（.gitignore対象なのでリポジトリには含まれません）。
