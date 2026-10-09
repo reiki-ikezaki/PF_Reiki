@@ -13,21 +13,26 @@ services:
     restart: unless-stopped
     # 共有サーバーのメモリが少ないため、使用量に上限を付けて軽量設定にする
     mem_limit: 450m
-    # --port : MySQLの待ち受けポートをデフォルト(3306)から変更する（.env の DB_PORT で変更可、未指定は 3316）
+    # --port : コンテナの中のMySQLの待ち受けポートを、デフォルト(3306)から変更する
+    #          （.env の DB_PORT で変更可、未指定は 3307）
     # --mysqlx=OFF : 使わないMySQL X Protocol(33060)を無効にして、メモリと公開口を減らす
-    command: ["--performance-schema=OFF", "--innodb-buffer-pool-size=64M", "--max-connections=30", "--port=${DB_PORT:-3316}", "--mysqlx=OFF"]
+    command: ["--performance-schema=OFF", "--innodb-buffer-pool-size=64M", "--max-connections=30", "--port=${DB_PORT:-3307}", "--mysqlx=OFF"]
     environment:
       # パスワードは同じフォルダの .env の DB_PASSWORD で指定できる（未指定なら root）
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_DATABASE: myapp_db
       TZ: Asia/Tokyo
-    # DBのポートは外部に公開しない（appコンテナからだけ db:<DB_PORT> でつながる）
+    ports:
+      # 左：サーバーの中から見える番号（.env の DB_HOST_PORT で変更可、未指定は 3311）
+      # 右：コンテナの中のMySQLの番号（上の --port と同じ DB_PORT にそろえる）
+      # 127.0.0.1 を付けているので、サーバーの外（インターネット側）からはつながらない
+      - "127.0.0.1:${DB_HOST_PORT:-3311}:${DB_PORT:-3307}"
     volumes:
       - db_data:/var/lib/mysql
       # 初回起動時だけ実行される初期化SQL（テーブル作成＋初期データ投入）
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -P ${DB_PORT:-3316} -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -P ${DB_PORT:-3307} -uroot -p$$MYSQL_ROOT_PASSWORD"]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -47,7 +52,7 @@ services:
     environment:
       CATALINA_OPTS: "-Xms64m -Xmx256m -XX:MaxMetaspaceSize=128m"
       DB_HOST: db          # docker-compose内ではサービス名がホスト名になる
-      DB_PORT: "${DB_PORT:-3316}"   # db側の --port と同じ値にする
+      DB_PORT: "${DB_PORT:-3307}"   # db側の --port と同じ値にする
       DB_NAME: myapp_db
       DB_USER: root
       DB_PASSWORD: ${DB_PASSWORD:-root}
