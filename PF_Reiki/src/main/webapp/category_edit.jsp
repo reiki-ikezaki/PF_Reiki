@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="model.Category" %>
+<%@ page import="util.HtmlUtil" %>
 
 <!DOCTYPE html>
 <html>
@@ -41,7 +42,7 @@
             <input type="hidden" name="id" value="<%= c.getId() %>">
 
             <label>カテゴリ名：</label><br>
-            <input type="text" name="name" value="<%= c.getName() %>"
+            <input type="text" name="name" value="<%= HtmlUtil.escape(c.getName()) %>"
                    style="width:100%; padding:8px;"><br><br>
 
             <button class="btn" type="submit">更新</button>

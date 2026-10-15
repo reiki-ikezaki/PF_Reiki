@@ -26,8 +26,11 @@ public class CategoryAddServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         String name = request.getParameter("name");
 
-        if (name == null || name.isEmpty() || name.length() > 255) {
+        // 空白だけの入力も「未入力」として扱う
+        if (name == null || name.trim().isEmpty() || name.length() > 255) {
             request.setAttribute("error", "カテゴリ名は1〜255文字で入力してください");
+            // 入力した内容を、画面に戻す（エラーでも入力欄を消さない）
+            request.setAttribute("name", name);
             request.getRequestDispatcher("/category_add.jsp").forward(request, response);
             return;
         }

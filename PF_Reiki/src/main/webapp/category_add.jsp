@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page import="util.HtmlUtil" %>
 
 <!DOCTYPE html>
 <html>
@@ -31,12 +32,13 @@
 
         <% String error = (String) request.getAttribute("error"); %>
         <% if (error != null) { %>
-            <p style="color:red;"><%= error %></p>
+            <p style="color:red;"><%= HtmlUtil.escape(error) %></p>
         <% } %>
 
         <form action="categoryAdd" method="post">
             <label>カテゴリ名：</label><br>
-            <input type="text" name="name" style="width:100%; padding:8px;"><br><br>
+            <!-- エラーで戻ってきたときは、入力した内容を残す -->
+            <input type="text" name="name" value="<%= HtmlUtil.escape((String) request.getAttribute("name")) %>" style="width:100%; padding:8px;"><br><br>
 
             <button class="btn" type="submit">登録</button>
             <a class="btn" href="categoryList">戻る</a>

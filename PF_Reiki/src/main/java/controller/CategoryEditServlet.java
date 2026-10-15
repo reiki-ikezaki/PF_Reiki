@@ -36,7 +36,8 @@ public class CategoryEditServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         String name = request.getParameter("name");
 
-        if (name == null || name.isEmpty() || name.length() > 255) {
+        // 空白だけの入力も「未入力」として扱う
+        if (name == null || name.trim().isEmpty() || name.length() > 255) {
             request.setAttribute("error", "カテゴリ名は1〜255文字で入力してください");
 
             Category c = new Category();
