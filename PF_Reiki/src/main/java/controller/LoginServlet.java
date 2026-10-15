@@ -64,6 +64,13 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
+            // アクセス禁止（banned）のアカウントは、パスワードが正しくてもログインさせない
+            if ("banned".equals(user.getStatus())) {
+                request.setAttribute("errorMessage", "このアカウントはアクセス禁止になっています。");
+                request.getRequestDispatcher("login.jsp").forward(request, response);
+                return;
+            }
+
             HttpSession session = request.getSession();
             session.setAttribute("userId", user.getId());
             session.setAttribute("username", user.getName());
