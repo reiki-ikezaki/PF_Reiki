@@ -453,4 +453,43 @@ public class UserDao {
         return list;
     }
 
+    // 公開の「月のいいねランキング」用：一般ユーザーを「今月のいいね数が多い順」で返す。
+    // 公開一覧（getGeneralUserList）と同じ項目を持つので、同じカード表示ができる。
+    public List<UserData> getGeneralUserRankingThisMonth() {
+
+        List<UserData> list = new ArrayList<>();
+
+        String sql = "SELECT u.id, u.username, u.name, u.email, u.furigana, u.gender, u.age, u.bio, "
+                   + "(SELECT COUNT(*) FROM likes l WHERE l.target_user_id = u.id "
+                   + "AND YEAR(l.created_at) = YEAR(CURDATE()) AND MONTH(l.created_at) = MONTH(CURDATE())) "
+                   + "AS like_count "
+                   + "FROM users u "
+                   + "WHERE u.role = 'user' AND u.status != 'deleted' "
+                   + "ORDER BY like_count DESC, u.id";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                UserData u = new UserData();
+                u.setId(rs.getInt("id"));
+                u.setUsername(rs.getString("username"));
+                u.setName(rs.getString("name"));
+                u.setEmail(rs.getString("email"));
+                u.setFurigana(rs.getString("furigana"));
+                u.setGender(rs.getString("gender"));
+                u.setAge(rs.getInt("age"));
+                u.setBio(rs.getString("bio"));
+                u.setLikeCount(rs.getInt("like_count"));
+                list.add(u);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 }

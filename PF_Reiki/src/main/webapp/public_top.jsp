@@ -1,12 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.UserData" %>
-<%@ page import="model.LikeRanking" %>
 <%@ page import="util.HtmlUtil" %>
 
 <%
     List<UserData> users = (List<UserData>) request.getAttribute("users");
-    List<LikeRanking> ranking = (List<LikeRanking>) request.getAttribute("ranking");
     boolean loggedIn = Boolean.TRUE.equals(request.getAttribute("loggedIn"));
     String dashboardUrl = (String) request.getAttribute("dashboardUrl");
 %>
@@ -154,16 +152,10 @@ async function sendLike(btn, targetUserId) {
         </div>
     <% } %>
 
-    <h2>いいねランキング（今月）</h2>
-
-    <%
-        int rankShown = 0;
-        for (LikeRanking r : ranking) {
-            if (rankShown >= 5) break;
-            rankShown++;
-    %>
-        <p><%= r.getName() %> → <%= r.getLikeCount() %> いいね</p>
-    <% } %>
+    <!-- 月のいいねランキングは、別の画面（public_ranking）にある -->
+    <p style="margin-top:20px;">
+        <a class="detail-link" style="margin-left:0;" href="public_ranking">月のいいねランキングを見る</a>
+    </p>
 
 </div>
 

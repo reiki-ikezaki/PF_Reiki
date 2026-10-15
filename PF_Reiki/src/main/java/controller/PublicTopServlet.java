@@ -10,9 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import dao.LikeDao;
 import dao.UserDao;
-import model.LikeRanking;
 import model.UserData;
 
 @WebServlet("/public_top")
@@ -24,12 +22,7 @@ public class PublicTopServlet extends HttpServlet {
         UserDao userDao = new UserDao();
         List<UserData> users = userDao.getGeneralUserList();
 
-
-        LikeDao likeDao = new LikeDao();
-        List<LikeRanking> ranking = likeDao.getLikeRankingThisMonth();
-
         request.setAttribute("users", users);
-        request.setAttribute("ranking", ranking);
 
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("userId") != null) {
