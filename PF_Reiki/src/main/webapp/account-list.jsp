@@ -160,6 +160,7 @@
     <div class="top-menu">
         <a href="adminDashboard" class="back-link">← 管理者ダッシュボードに戻る</a>
         <a href="account-add.jsp" class="add-btn">アカウント追加</a>
+        <a href="deleteAccountList" class="add-btn" style="background:#6c757d;">削除済みアカウント一覧</a>
 
         <form action="logout" method="post">
     <button type="submit">ログアウト</button>
