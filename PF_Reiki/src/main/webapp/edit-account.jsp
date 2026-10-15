@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="model.UserData" %>
+<%@ page import="util.HtmlUtil" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -108,14 +110,17 @@
 <script>
 function toggleRole() {
     const role = document.querySelector('input[name="role"]:checked').value;
+    const isAdmin = (role === "admin");
 
-    if (role === "admin") {
-        document.getElementById("adminFields").style.display = "block";
-        document.getElementById("userFields").style.display = "none";
-    } else {
-        document.getElementById("adminFields").style.display = "none";
-        document.getElementById("userFields").style.display = "block";
-    }
+    document.getElementById("adminFields").style.display = isAdmin ? "block" : "none";
+
+    const userFields = document.getElementById("userFields");
+    userFields.style.display = isAdmin ? "none" : "block";
+
+    // 管理者のときは、一般項目を送信しない（disabled の入力欄は、送信されない）
+    userFields.querySelectorAll("input, select, textarea").forEach(function (el) {
+        el.disabled = isAdmin;
+    });
 }
 </script>
 
@@ -128,23 +133,38 @@ function toggleRole() {
 
 <div class="msg" style="color:red;">${error}</div>
 
+<%
+    // 編集対象のアカウント（無ければ案内を出す）
+    UserData eu = (UserData) request.getAttribute("user");
+    if (eu == null) {
+%>
+    <p>編集するアカウントが見つかりません。</p>
+    <a href="accountList" class="back-link">アカウント一覧に戻る</a>
+<%
+    } else {
+        // エラーで戻ってきたときは、送信された値を表示する（入力内容を消さない）。
+        // 送信された値が無いとき（初めて開いたとき）は、DBの値を表示する。
+        String fRole   = HtmlUtil.paramOr(request, "role",   eu.getRole());
+        String fStatus = HtmlUtil.paramOr(request, "status", eu.getStatus());
+        String fGender = HtmlUtil.paramOr(request, "gender", eu.getGender());
+        if (fGender.isEmpty()) { fGender = "male"; }
+%>
+
 <form action="editUser" method="post" enctype="multipart/form-data">
 
     <!-- ▼ ID（編集時は変更不可） -->
-    <input type="hidden" name="id" value="${user.id}">
+    <input type="hidden" name="id" value="<%= eu.getId() %>">
 
     <!-- ▼ ユーザー種別 -->
     <div class="vertical">
         <label>ユーザー種別</label>
         <div class="radio-group">
             <label>
-                <input type="radio" name="role" value="user"
-                    ${user.role == 'user' ? 'checked' : ''} onclick="toggleRole()">
+                <input type="radio" name="role" value="user" <%= "user".equals(fRole) ? "checked" : "" %> onclick="toggleRole()">
                 一般ユーザー
             </label>
             <label>
-                <input type="radio" name="role" value="admin"
-                    ${user.role == 'admin' ? 'checked' : ''} onclick="toggleRole()">
+                <input type="radio" name="role" value="admin" <%= "admin".equals(fRole) ? "checked" : "" %> onclick="toggleRole()">
                 管理者
             </label>
         </div>
@@ -154,61 +174,59 @@ function toggleRole() {
     <div class="vertical">
         <label>ステータス</label>
         <div class="radio-group">
-            <label><input type="radio" name="status" value="active"
-                ${user.status == 'active' ? 'checked' : ''}> 有効</label>
-            <label><input type="radio" name="status" value="banned"
-                ${user.status == 'banned' ? 'checked' : ''}> アクセス禁止</label>
+            <label><input type="radio" name="status" value="active" <%= "active".equals(fStatus) ? "checked" : "" %>> 有効</label>
+            <label><input type="radio" name="status" value="banned" <%= "banned".equals(fStatus) ? "checked" : "" %>> アクセス禁止</label>
         </div>
     </div>
 
-    <!-- ▼ 共通項目（ユーザー種別によらず必須） -->
+    <!-- ▼ 共通項目（管理者・一般どちらも必須）：ユーザー名・メール・名前・パスワード -->
     <div class="vertical">
 
         <label>ユーザー名</label>
-        <input type="text" name="username" value="${user.username}">
+        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", eu.getUsername()) %>" required>
 
         <label>メールアドレス</label>
-        <input type="email" name="email" value="${user.email}">
+        <input type="email" name="email" value="<%= HtmlUtil.paramOr(request, "email", eu.getEmail()) %>" required>
 
         <label>名前</label>
-        <input type="text" name="name" value="${user.name}">
+        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", eu.getName()) %>" required>
 
         <label>パスワード（変更する場合のみ入力・半角英数字（英字・数字を両方含む）と _ - で8〜32文字）</label>
         <input type="password" name="password" placeholder="変更する場合のみ入力" autocomplete="new-password">
 
+    </div>
+
+    <!-- ▼ 一般ユーザー項目（管理者を選ぶと非表示になり、送信もされない） -->
+    <div id="userFields" class="vertical" style="<%= "user".equals(fRole) ? "" : "display:none;" %>">
+
         <label>プロフィール画像</label>
-        <img src="profileImage?id=${user.id}"
+        <img src="profileImage?id=<%= eu.getId() %>"
              style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0; display:block;"
              onerror="this.style.display='none';">
         <label>変更する場合のみ選択（jpg / jpeg / png / gif・2MB以下）</label>
         <input type="file" name="profileImage" id="profileImageInput" accept="image/*">
         <div id="fileError" style="color:red; margin-top:6px;"></div>
 
-    </div>
-
-    <!-- ▼ 一般ユーザー項目 -->
-    <div id="userFields" class="vertical" style="${user.role == 'user' ? '' : 'display:none;'}">
-
         <label>ふりがな（ひらがなのみ）</label>
-        <input type="text" name="furigana" value="${user.furigana}">
+        <input type="text" name="furigana" value="<%= HtmlUtil.paramOr(request, "furigana", eu.getFurigana()) %>">
 
         <label>性別</label>
         <select name="gender">
-            <option value="male"   ${user.gender == 'male' ? 'selected' : ''}>男性</option>
-            <option value="female" ${user.gender == 'female' ? 'selected' : ''}>女性</option>
-            <option value="other"  ${user.gender == 'other' ? 'selected' : ''}>その他</option>
+            <option value="male"   <%= "male".equals(fGender)   ? "selected" : "" %>>男性</option>
+            <option value="female" <%= "female".equals(fGender) ? "selected" : "" %>>女性</option>
+            <option value="other"  <%= "other".equals(fGender)  ? "selected" : "" %>>その他</option>
         </select>
 
         <label>年齢</label>
-        <input type="number" name="age" value="${user.age}" min="0" max="999">
+        <input type="number" name="age" min="0" max="999" value="<%= HtmlUtil.paramOr(request, "age", String.valueOf(eu.getAge())) %>">
 
         <label>自己紹介</label>
-        <textarea name="bio" rows="4">${user.bio}</textarea>
+        <textarea name="bio" rows="4"><%= HtmlUtil.paramOr(request, "bio", eu.getBio()) %></textarea>
 
     </div>
 
-    <!-- ▼ 管理者項目 -->
-    <div id="adminFields" class="vertical" style="${user.role == 'admin' ? '' : 'display:none;'}">
+    <!-- ▼ 管理者項目（共通項目のみ。追加の入力欄は無い） -->
+    <div id="adminFields" class="vertical" style="<%= "admin".equals(fRole) ? "" : "display:none;" %>">
     </div>
 
     <div class="btn-area" style="margin-top:20px; display:flex; gap:20px; align-items:center;">
@@ -217,6 +235,8 @@ function toggleRole() {
     </div>
 
 </form>
+
+<% } %>
 
 </div>
 

@@ -20,8 +20,36 @@ public class AccountValidator {
     private AccountValidator() {
     }
 
+    // 権限は「一般 / 管理者」の2択（ラジオボタン以外の値が来たらエラー）
+    public static String validateRole(String role) {
+        if (!"user".equals(role) && !"admin".equals(role)) {
+            return "ユーザー種別の値が不正です。";
+        }
+        return null;
+    }
+
+    // ステータスは「有効 / アクセス禁止」の2択
+    public static String validateStatus(String status) {
+        if (!"active".equals(status) && !"banned".equals(status)) {
+            return "ステータスの値が不正です。";
+        }
+        return null;
+    }
+
+    // ユーザー名：必須・255文字以内
+    public static String validateUsername(String username) {
+        if (username == null || username.trim().isEmpty()) {
+            return "ユーザー名を入力してください。";
+        }
+        if (username.length() > 255) {
+            return "ユーザー名は255文字以内で入力してください。";
+        }
+        return null;
+    }
+
     public static String validateName(String name) {
-        if (name == null || name.isEmpty()) {
+        // 空白だけの入力も「未入力」として扱う
+        if (name == null || name.trim().isEmpty()) {
             return "名前を入力してください。";
         }
         if (name.length() > 255) {

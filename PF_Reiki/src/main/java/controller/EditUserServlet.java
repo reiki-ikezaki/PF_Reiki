@@ -16,6 +16,9 @@ import dao.UserDao;
 import model.UserData;
 import util.AccountValidator;
 
+// アカウント編集（管理者用）。URL: /editUser
+//   GET  … 編集画面を表示
+//   POST … 入力を検証して更新（ユーザー種別に応じて、検証・保存する項目を切り替える）
 @WebServlet("/editUser")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class EditUserServlet extends HttpServlet {
@@ -43,86 +46,124 @@ public class EditUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // 日本語が文字化けしないよう、先にUTF-8を指定する
+        request.setCharacterEncoding("UTF-8");
+
         int id = Integer.parseInt(request.getParameter("id"));
         UserDao dao = new UserDao();
 
-        Part filePart;
+        Part filePart = null;
         try {
             filePart = request.getPart("profileImage");
         } catch (Exception e) {
-            request.setAttribute("error", "プロフィール画像は2MB以下にしてください。");
-            request.setAttribute("user", dao.findById(id));
-            request.getRequestDispatcher("edit-account.jsp").forward(request, response);
+            getServletContext().log("[アカウント編集] フォームの受け取りに失敗", e);
+            showError(request, response, dao, id, "プロフィール画像は2MB以下にしてください。");
             return;
         }
 
+        String role = request.getParameter("role");
+        String status = request.getParameter("status");
+        String username = request.getParameter("username");
         String name = request.getParameter("name");
         String email = request.getParameter("email");
         String password = request.getParameter("password");
-        String furigana = request.getParameter("furigana");
-        String gender = request.getParameter("gender");
-        String ageStr = request.getParameter("age");
-        String bio = request.getParameter("bio");
 
-        String error = AccountValidator.validateName(name);
+        boolean isAdmin = "admin".equals(role);
+
+        // ① 共通項目の検証（パスワードは「変更する場合のみ」入力。空なら変更しない）
+        String error = AccountValidator.validateRole(role);
+        if (error == null) error = AccountValidator.validateStatus(status);
+        if (error == null) error = AccountValidator.validateUsername(username);
+        if (error == null) error = AccountValidator.validateName(name);
         if (error == null) error = AccountValidator.validateEmail(email);
         if (error == null) error = AccountValidator.validatePassword(password);
-        if (error == null) error = AccountValidator.validateFurigana(furigana);
-        if (error == null) error = AccountValidator.validateGender(gender);
-        if (error == null) error = AccountValidator.validateAge(ageStr);
-        if (error == null) error = AccountValidator.validateBio(bio);
-        if (error == null && filePart != null && filePart.getSize() > 0) {
-            error = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
-            if (error == null) {
-                error = AccountValidator.validateImageSize(filePart.getSize());
+        if (error == null && dao.existsUsername(username, id)) {
+            error = "このユーザー名は既に使われています。";
+        }
+
+        // ② 一般項目の検証（一般ユーザーのときだけ）
+        String furigana = null;
+        String gender = null;
+        String ageStr = null;
+        String bio = null;
+
+        if (!isAdmin) {
+            furigana = request.getParameter("furigana");
+            gender = request.getParameter("gender");
+            ageStr = request.getParameter("age");
+            bio = request.getParameter("bio");
+
+            if (error == null) error = AccountValidator.validateFurigana(furigana);
+            if (error == null) error = AccountValidator.validateGender(gender);
+            if (error == null) error = AccountValidator.validateAge(ageStr);
+            if (error == null) error = AccountValidator.validateBio(bio);
+            if (error == null && filePart != null && filePart.getSize() > 0) {
+                error = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
+                if (error == null) {
+                    error = AccountValidator.validateImageSize(filePart.getSize());
+                }
             }
         }
 
         if (error != null) {
-            request.setAttribute("error", error);
-            request.setAttribute("user", dao.findById(id));
-            request.getRequestDispatcher("edit-account.jsp").forward(request, response);
+            showError(request, response, dao, id, error);
             return;
         }
 
+        // ③ 保存する（管理者には、一般項目を保存しない）
         byte[] imageBytes = null;
-        if (filePart != null && filePart.getSize() > 0) {
-            try (InputStream in = filePart.getInputStream();
-                 ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                byte[] buf = new byte[8192];
-                int n;
-                while ((n = in.read(buf)) != -1) {
-                    out.write(buf, 0, n);
+        int age = 0;
+
+        if (!isAdmin) {
+            if (filePart != null && filePart.getSize() > 0) {
+                try (InputStream in = filePart.getInputStream();
+                     ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                    byte[] buf = new byte[8192];
+                    int n;
+                    while ((n = in.read(buf)) != -1) {
+                        out.write(buf, 0, n);
+                    }
+                    imageBytes = out.toByteArray();
                 }
-                imageBytes = out.toByteArray();
+            }
+            if (ageStr != null && !ageStr.isEmpty()) {
+                age = Integer.parseInt(ageStr);
             }
         }
 
         UserData user = new UserData();
         user.setId(id);
-        user.setRole(request.getParameter("role"));
-        user.setStatus(request.getParameter("status"));
-        user.setUsername(request.getParameter("username"));
+        user.setRole(role);
+        user.setStatus(status);
+        user.setUsername(username);
         user.setEmail(email);
         user.setName(name);
-        user.setFurigana(furigana);
-        user.setGender(gender);
-        user.setBio(bio);
-
-        int age = 0;
-        if (ageStr != null && !ageStr.isEmpty()) {
-            age = Integer.parseInt(ageStr);
-        }
+        user.setFurigana(isAdmin ? null : furigana);
+        user.setGender(isAdmin || gender == null || gender.isEmpty() ? null : gender);
         user.setAge(age);
+        user.setBio(isAdmin ? null : bio);
 
         boolean result = dao.updateAccount(user, password, imageBytes);
 
         if (result) {
             response.sendRedirect("accountList");
         } else {
-            request.setAttribute("error", "更新に失敗しました");
-            request.setAttribute("user", dao.findById(id));
-            request.getRequestDispatcher("edit-account.jsp").forward(request, response);
+            showError(request, response, dao, id, "更新に失敗しました。");
         }
+    }
+
+    // エラーメッセージを付けて、編集画面へ戻す。
+    // 送信された値はリクエストのパラメータに残っているので、画面側（edit-account.jsp）が
+    // それを入力欄に戻す（入力内容が消えない）。パラメータが無い項目は、DBの値を表示する。
+    private void showError(HttpServletRequest request, HttpServletResponse response,
+            UserDao dao, int id, String message) throws ServletException, IOException {
+        // 原因調査用のログ（入力値そのものは出さず、届いた項目名だけを記録する）
+        getServletContext().log("[アカウント編集] エラー: " + message
+                + " / Content-Type=" + request.getContentType()
+                + " / 届いた項目=" + request.getParameterMap().keySet());
+
+        request.setAttribute("error", message);
+        request.setAttribute("user", dao.findById(id));
+        request.getRequestDispatcher("edit-account.jsp").forward(request, response);
     }
 }

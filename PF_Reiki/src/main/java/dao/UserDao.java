@@ -516,6 +516,28 @@ public class UserDao {
         return list;
     }
 
+    // ユーザー名が既に使われているか（excludeId のユーザー自身は除く。追加時は 0 を渡す）
+    public boolean existsUsername(String username, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM users WHERE username = ? AND id != ?";
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, username);
+            pstmt.setInt(2, excludeId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     // 管理者の「アカウント設定」用：メールアドレス・パスワード・名前だけを更新する。
     // （ふりがな・性別・年齢・自己紹介・画像は、管理者には無い項目なので触らない）
     public boolean updateAdminSettings(int id, String email, String password, String name) {
