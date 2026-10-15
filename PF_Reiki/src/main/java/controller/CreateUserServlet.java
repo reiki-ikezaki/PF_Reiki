@@ -48,19 +48,23 @@ public class CreateUserServlet extends HttpServlet {
 
         boolean isAdmin = "admin".equals(role);
 
+        // 検証は、画面の上から下の並び順で行い、最初に見つかった1件のエラーを表示する。
+        //   画面の並び：ユーザー種別 → ステータス → ユーザー名 → メール → 名前 → パスワード
+        //               →（一般のみ）画像 → ふりがな → 性別 → 年齢 → 自己紹介
+
         // ① 共通項目の検証（管理者・一般 どちらでも必要）
         String error = AccountValidator.validateRole(role);
         if (error == null) error = AccountValidator.validateStatus(status);
         if (error == null) error = AccountValidator.validateUsername(username);
-        if (error == null) error = AccountValidator.validateName(name);
+        if (error == null && new UserDao().existsUsername(username, 0)) {
+            error = "このユーザー名は既に使われています。";
+        }
         if (error == null) error = AccountValidator.validateEmail(email);
+        if (error == null) error = AccountValidator.validateName(name);
         if (error == null && (password == null || password.isEmpty())) {
             error = "パスワードを入力してください。";
         }
         if (error == null) error = AccountValidator.validatePassword(password);
-        if (error == null && new UserDao().existsUsername(username, 0)) {
-            error = "このユーザー名は既に使われています。";
-        }
 
         // ② 一般項目の検証（一般ユーザーを追加するときだけ）
         String furigana = null;
@@ -74,16 +78,16 @@ public class CreateUserServlet extends HttpServlet {
             ageStr = request.getParameter("age");
             bio = request.getParameter("bio");
 
-            if (error == null) error = AccountValidator.validateFurigana(furigana);
-            if (error == null) error = AccountValidator.validateGender(gender);
-            if (error == null) error = AccountValidator.validateAge(ageStr);
-            if (error == null) error = AccountValidator.validateBio(bio);
             if (error == null && filePart != null && filePart.getSize() > 0) {
                 error = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
                 if (error == null) {
                     error = AccountValidator.validateImageSize(filePart.getSize());
                 }
             }
+            if (error == null) error = AccountValidator.validateFurigana(furigana);
+            if (error == null) error = AccountValidator.validateGender(gender);
+            if (error == null) error = AccountValidator.validateAge(ageStr);
+            if (error == null) error = AccountValidator.validateBio(bio);
         }
 
         if (error != null) {

@@ -169,16 +169,16 @@ function toggleRole() {
     <div class="vertical">
 
         <label>ユーザー名</label>
-        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", "") %>" required>
+        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", "") %>">
 
         <label>メールアドレス</label>
-        <input type="email" name="email" value="<%= HtmlUtil.paramOr(request, "email", "") %>" required>
+        <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", "") %>">
 
         <label>名前</label>
-        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", "") %>" required>
+        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", "") %>">
 
         <label>パスワード（半角英数字（英字・数字を両方含む）と _ - で8〜32文字）</label>
-        <input type="password" name="password" autocomplete="new-password" required>
+        <input type="password" name="password" autocomplete="new-password">
 
     </div>
 
@@ -200,7 +200,7 @@ function toggleRole() {
         </select>
 
         <label>年齢</label>
-        <input type="number" name="age" min="0" max="999" value="<%= HtmlUtil.paramOr(request, "age", "") %>">
+        <input type="text" inputmode="numeric" name="age" value="<%= HtmlUtil.paramOr(request, "age", "") %>">
 
         <label>自己紹介</label>
         <textarea name="bio" rows="4"><%= HtmlUtil.paramOr(request, "bio", "") %></textarea>

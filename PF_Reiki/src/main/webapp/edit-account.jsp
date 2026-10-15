@@ -183,13 +183,13 @@ function toggleRole() {
     <div class="vertical">
 
         <label>ユーザー名</label>
-        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", eu.getUsername()) %>" required>
+        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", eu.getUsername()) %>">
 
         <label>メールアドレス</label>
-        <input type="email" name="email" value="<%= HtmlUtil.paramOr(request, "email", eu.getEmail()) %>" required>
+        <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", eu.getEmail()) %>">
 
         <label>名前</label>
-        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", eu.getName()) %>" required>
+        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", eu.getName()) %>">
 
         <label>パスワード（変更する場合のみ入力・半角英数字（英字・数字を両方含む）と _ - で8〜32文字）</label>
         <input type="password" name="password" placeholder="変更する場合のみ入力" autocomplete="new-password">
@@ -218,7 +218,7 @@ function toggleRole() {
         </select>
 
         <label>年齢</label>
-        <input type="number" name="age" min="0" max="999" value="<%= HtmlUtil.paramOr(request, "age", String.valueOf(eu.getAge())) %>">
+        <input type="text" inputmode="numeric" name="age" value="<%= HtmlUtil.paramOr(request, "age", String.valueOf(eu.getAge())) %>">
 
         <label>自己紹介</label>
         <textarea name="bio" rows="4"><%= HtmlUtil.paramOr(request, "bio", eu.getBio()) %></textarea>

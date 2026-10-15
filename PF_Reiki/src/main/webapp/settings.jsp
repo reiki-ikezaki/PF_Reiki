@@ -145,6 +145,10 @@
 
     <form action="settings" method="post">
 
+        <div class="msg error">${error}</div>
+        <div class="msg success">${success}</div>
+
+
         <label>メールアドレス</label>
         <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", me.getEmail()) %>">
 
@@ -159,8 +163,6 @@
 
         <button type="submit" class="submit-btn">更新</button>
 
-        <div class="msg error">${error}</div>
-        <div class="msg success">${success}</div>
     </form>
 
     <div style="text-align:center; margin-top:15px;">

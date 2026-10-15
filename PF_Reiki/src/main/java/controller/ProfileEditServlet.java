@@ -45,41 +45,43 @@ public class ProfileEditServlet extends HttpServlet {
         String ageStr = request.getParameter("age");
         String bio = request.getParameter("bio");
 
-        // ① 項目の検証
-        String error = AccountValidator.validateName(name);
+        // 検証は、画面の上から下の並び順で行い、最初に見つかった1件のエラーを表示する。
+        //   画面の並び：プロフィール画像 → 名前 → ふりがな → 性別 → 年齢 → 自己紹介
+
+        // ① プロフィール画像の検証（選択されたときだけ）
+        String error = null;
+        byte[] imageBytes = null;
+
+        try {
+            Part part = request.getPart("profileImage");
+
+            if (part != null && part.getSize() > 0) {
+                error = AccountValidator.validateImageExtension(part.getSubmittedFileName());
+                if (error == null) error = AccountValidator.validateImageSize(part.getSize());
+
+                if (error == null) {
+                    try (InputStream in = part.getInputStream();
+                         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                        byte[] buf = new byte[8192];
+                        int n;
+                        while ((n = in.read(buf)) != -1) {
+                            out.write(buf, 0, n);
+                        }
+                        imageBytes = out.toByteArray();
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            error = "プロフィール画像は2MB以下にしてください。";
+        }
+
+        // ② 名前・ふりがな・性別・年齢・自己紹介の検証
+        if (error == null) error = AccountValidator.validateName(name);
         if (error == null) error = AccountValidator.validateFurigana(furigana);
         if (error == null) error = AccountValidator.validateGender(gender);
         if (error == null) error = AccountValidator.validateAge(ageStr);
         if (error == null) error = AccountValidator.validateBio(bio);
-
-        // ② プロフィール画像の検証（選択されたときだけ）
-        byte[] imageBytes = null;
-
-        if (error == null) {
-            try {
-                Part part = request.getPart("profileImage");
-
-                if (part != null && part.getSize() > 0) {
-                    error = AccountValidator.validateImageExtension(part.getSubmittedFileName());
-                    if (error == null) error = AccountValidator.validateImageSize(part.getSize());
-
-                    if (error == null) {
-                        try (InputStream in = part.getInputStream();
-                             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                            byte[] buf = new byte[8192];
-                            int n;
-                            while ((n = in.read(buf)) != -1) {
-                                out.write(buf, 0, n);
-                            }
-                            imageBytes = out.toByteArray();
-                        }
-                    }
-                }
-
-            } catch (Exception e) {
-                error = "プロフィール画像は2MB以下にしてください。";
-            }
-        }
 
         if (error != null) {
             showError(request, response, error);

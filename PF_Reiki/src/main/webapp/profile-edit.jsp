@@ -156,6 +156,10 @@
 
     <form action="profileEdit" method="post" enctype="multipart/form-data">
 
+        <div class="msg error">${error}</div>
+        <div class="msg success">${success}</div>
+
+
         <label>プロフィール画像（jpg/png/gif・2MB以下）</label><br>
         <img src="profileImage?id=<%= me.getId() %>"
              style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0;"
@@ -177,15 +181,13 @@
         </select>
 
         <label>年齢</label>
-        <input type="number" name="age" value="<%= HtmlUtil.paramOr(request, "age", String.valueOf(me.getAge())) %>" min="0" max="999">
+        <input type="text" inputmode="numeric" name="age" value="<%= HtmlUtil.paramOr(request, "age", String.valueOf(me.getAge())) %>">
 
         <label>自己紹介</label>
         <textarea name="bio" rows="4"><%= HtmlUtil.paramOr(request, "bio", me.getBio()) %></textarea>
 
         <button type="submit" class="submit-btn">更新</button>
 
-        <div class="msg error">${error}</div>
-        <div class="msg success">${success}</div>
     </form>
 
     <div style="text-align:center; margin-top:15px;">

@@ -99,12 +99,12 @@
 
         <div class="form-group">
             <label>ユーザーネーム</label>
-            <input type="text" name="username" required>
+            <input type="text" name="username">
         </div>
 
         <div class="form-group">
             <label>パスワード</label>
-            <input type="password" name="password" required>
+            <input type="password" name="password">
         </div>
 
         <button type="submit">ログイン</button>
