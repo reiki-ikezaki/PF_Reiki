@@ -28,8 +28,8 @@ public class AuthFilter implements Filter {
 
     //  ログインしていれば開けるURL
     private static final Set<String> LOGIN_REQUIRED_PATHS = Set.of(
-            "/userDashboard", "/profileEdit",
-            "/user-dashboard.jsp", "/profile-edit.jsp");
+            "/userDashboard", "/profileEdit", "/settings",
+            "/user-dashboard.jsp", "/profile-edit.jsp", "/settings.jsp");
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)

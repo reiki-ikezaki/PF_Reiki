@@ -16,8 +16,11 @@ import jakarta.servlet.http.Part;
 import dao.UserDao;
 import model.UserData;
 import util.AccountValidator;
-import util.PasswordUtil;
 
+// 一般ユーザーの「自己紹介編集（プロフィール）」画面の処理。URL: /profileEdit（POST）
+//   編集できる項目：プロフィール画像・名前・ふりがな・性別・年齢・自己紹介
+//   （メールアドレス・パスワードは「設定」画面 /settings で変更する）
+//   管理者にはプロフィールが無いので、管理者が来たら「設定」画面へ移す。
 @WebServlet("/profileEdit")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class ProfileEditServlet extends HttpServlet {
@@ -31,82 +34,55 @@ public class ProfileEditServlet extends HttpServlet {
         HttpSession session = request.getSession();
         UserData user = (UserData) session.getAttribute("user");
 
-        byte[] imageBytes = null;
-
-        try {
-            Part part = request.getPart("profileImage");
-
-            if (part != null && part.getSize() > 0) {
-
-                String submittedName = part.getSubmittedFileName().toLowerCase();
-
-                if (!(submittedName.endsWith(".jpg") ||
-                      submittedName.endsWith(".jpeg") ||
-                      submittedName.endsWith(".png") ||
-                      submittedName.endsWith(".gif"))) {
-
-                    request.setAttribute("error", "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。");
-                    forward(request, response);
-                    return;
-                }
-
-                if (part.getSize() > 1024 * 1024 * 2) {
-                    request.setAttribute("error", "画像は2MB以下にしてください。");
-                    forward(request, response);
-                    return;
-                }
-
-                try (InputStream in = part.getInputStream();
-                     ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-                    byte[] buf = new byte[8192];
-                    int n;
-                    while ((n = in.read(buf)) != -1) {
-                        out.write(buf, 0, n);
-                    }
-                    imageBytes = out.toByteArray();
-                }
-            }
-
-        } catch (Exception e) {
-            request.setAttribute("error", "画像は2MB以下にしてください。");
-            forward(request, response);
+        if ("admin".equals(user.getRole())) {
+            response.sendRedirect("settings");
             return;
         }
 
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
         String name = request.getParameter("name");
         String furigana = request.getParameter("furigana");
         String gender = request.getParameter("gender");
         String ageStr = request.getParameter("age");
         String bio = request.getParameter("bio");
 
-        if (!isValidEmail(email)) {
-            request.setAttribute("error", "メールアドレスの形式が不正、または255文字を超えています。");
-            forward(request, response);
-            return;
-        }
-
-        if (password != null && !password.isEmpty() && !isValidPassword(password)) {
-            request.setAttribute("error", "パスワードは8〜32文字の半角英数字（英字・数字を両方含む）と _ - のみ使用できます。");
-            forward(request, response);
-            return;
-        }
-
-        if (!isValidName(name)) {
-            request.setAttribute("error", "名前は255文字以内で入力してください。");
-            forward(request, response);
-            return;
-        }
-
-        String error = AccountValidator.validateFurigana(furigana);
+        // ① 項目の検証
+        String error = AccountValidator.validateName(name);
+        if (error == null) error = AccountValidator.validateFurigana(furigana);
         if (error == null) error = AccountValidator.validateGender(gender);
         if (error == null) error = AccountValidator.validateAge(ageStr);
         if (error == null) error = AccountValidator.validateBio(bio);
 
+        // ② プロフィール画像の検証（選択されたときだけ）
+        byte[] imageBytes = null;
+
+        if (error == null) {
+            try {
+                Part part = request.getPart("profileImage");
+
+                if (part != null && part.getSize() > 0) {
+                    error = AccountValidator.validateImageExtension(part.getSubmittedFileName());
+                    if (error == null) error = AccountValidator.validateImageSize(part.getSize());
+
+                    if (error == null) {
+                        try (InputStream in = part.getInputStream();
+                             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                            byte[] buf = new byte[8192];
+                            int n;
+                            while ((n = in.read(buf)) != -1) {
+                                out.write(buf, 0, n);
+                            }
+                            imageBytes = out.toByteArray();
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                error = "プロフィール画像は2MB以下にしてください。";
+            }
+        }
+
         if (error != null) {
-            request.setAttribute("error", error);
-            forward(request, response);
+            showError(request, response, error);
             return;
         }
 
@@ -115,20 +91,16 @@ public class ProfileEditServlet extends HttpServlet {
             age = Integer.parseInt(ageStr);
         }
 
+        // ③ 更新
         UserDao dao = new UserDao();
-        boolean updated = dao.updateUser(user.getId(), email, password, name,
-                furigana, gender, age, bio, imageBytes);
+        boolean updated = dao.updateProfile(user.getId(), name, furigana, gender, age, bio, imageBytes);
 
         if (!updated) {
-            request.setAttribute("error", "更新に失敗しました。");
-            forward(request, response);
+            showError(request, response, "更新に失敗しました。");
             return;
         }
 
-        user.setEmail(email);
-        if (password != null && !password.isEmpty()) {
-            user.setPassword(PasswordUtil.hash(password));
-        }
+        // セッション内のユーザー情報にも反映する
         user.setName(name);
         user.setFurigana(furigana);
         user.setGender(gender);
@@ -140,30 +112,14 @@ public class ProfileEditServlet extends HttpServlet {
         forward(request, response);
     }
 
+    private void showError(HttpServletRequest request, HttpServletResponse response, String message)
+            throws ServletException, IOException {
+        request.setAttribute("error", message);
+        forward(request, response);
+    }
+
     private void forward(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("profile-edit.jsp").forward(request, response);
-    }
-
-    private boolean isValidEmail(String email) {
-        if (email == null || email.isEmpty()) return false;
-        if (email.length() > 255) return false;
-
-        String regex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
-        return email.matches(regex);
-    }
-
-    private boolean isValidPassword(String pass) {
-        if (pass == null) return false;
-        if (pass.length() < 8 || pass.length() > 32) return false;
-
-        // 英字1文字以上・数字1文字以上を必須にする（英字のみ／数字のみは不可）
-        String regex = "^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9_-]+$";
-        return pass.matches(regex);
-    }
-
-    private boolean isValidName(String name) {
-        if (name == null || name.isEmpty()) return false;
-        return name.length() <= 255;
     }
 }

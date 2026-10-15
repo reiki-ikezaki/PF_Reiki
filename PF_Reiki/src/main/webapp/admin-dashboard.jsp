@@ -153,7 +153,7 @@
         <a href="deleteAccountList">削除済みアカウント一覧</a>
         <a href="ranking">いいねランキング</a>
         <a href="generalList">一般ユーザー一覧</a>
-        <a href="profile-edit.jsp">アカウント設定</a>
+        <a href="settings">アカウント設定</a>
 
     </div>
 

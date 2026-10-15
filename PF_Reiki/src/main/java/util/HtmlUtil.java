@@ -23,6 +23,15 @@ public class HtmlUtil {
                 .replace("'", "&#39;");
     }
 
+    // フォームの入力値を、エラー時に画面へ戻すための補助。
+    //   送信された値（パラメータ）があればそれを、無ければ fallback を、エスケープして返す。
+    //   （検証エラーで同じ画面に戻ったとき、入力内容を消さないために使う）
+    public static String paramOr(jakarta.servlet.http.HttpServletRequest request,
+            String key, String fallback) {
+        String value = request.getParameter(key);
+        return escape(value != null ? value : fallback);
+    }
+
     public static String escapeAndBr(String text) {
         return escape(text).replace("\r\n", "<br>").replace("\n", "<br>");
     }

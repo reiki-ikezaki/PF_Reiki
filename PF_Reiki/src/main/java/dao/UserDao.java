@@ -78,16 +78,14 @@ public class UserDao {
         }
     }
 
-    public boolean updateUser(int id, String email, String password, String name,
-            String furigana, String gender, int age, String bio, byte[] imageBytes) {
-
-        boolean changePassword = password != null && !password.isEmpty();
+    // 一般ユーザーの「自己紹介編集（プロフィール）」用：
+    //   名前・ふりがな・性別・年齢・自己紹介（と、選択されたときだけプロフィール画像）を更新する。
+    //   メールアドレス・パスワードは「設定」画面の担当なので、ここでは触らない。
+    public boolean updateProfile(int id, String name, String furigana, String gender,
+            int age, String bio, byte[] imageBytes) {
 
         StringBuilder sql = new StringBuilder(
-                "UPDATE users SET email = ?, name = ?, furigana = ?, gender = ?, age = ?, bio = ?");
-        if (changePassword) {
-            sql.append(", password = ?");
-        }
+                "UPDATE users SET name = ?, furigana = ?, gender = ?, age = ?, bio = ?");
         if (imageBytes != null) {
             sql.append(", profile_image = ?");
         }
@@ -97,15 +95,11 @@ public class UserDao {
              PreparedStatement pStmt = conn.prepareStatement(sql.toString())) {
 
             int i = 1;
-            pStmt.setString(i++, email);
             pStmt.setString(i++, name);
             pStmt.setString(i++, furigana);
             pStmt.setString(i++, gender);
             pStmt.setInt(i++, age);
             pStmt.setString(i++, bio);
-            if (changePassword) {
-                pStmt.setString(i++, PasswordUtil.hash(password));
-            }
             if (imageBytes != null) {
                 pStmt.setBytes(i++, imageBytes);
             }
@@ -113,6 +107,36 @@ public class UserDao {
 
             int result = pStmt.executeUpdate();
             return result == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    // 一般ユーザーの「設定」用：メールアドレスと（入力されたときだけ）パスワードを更新する。
+    public boolean updateEmailAndPassword(int id, String email, String password) {
+
+        boolean changePassword = password != null && !password.isEmpty();
+
+        StringBuilder sql = new StringBuilder("UPDATE users SET email = ?");
+        if (changePassword) {
+            sql.append(", password = ?");
+        }
+        sql.append(" WHERE id = ?");
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
+            int i = 1;
+            pstmt.setString(i++, email);
+            if (changePassword) {
+                pstmt.setString(i++, PasswordUtil.hash(password));
+            }
+            pstmt.setInt(i++, id);
+
+            return pstmt.executeUpdate() == 1;
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -490,6 +514,38 @@ public class UserDao {
         }
 
         return list;
+    }
+
+    // 管理者の「アカウント設定」用：メールアドレス・パスワード・名前だけを更新する。
+    // （ふりがな・性別・年齢・自己紹介・画像は、管理者には無い項目なので触らない）
+    public boolean updateAdminSettings(int id, String email, String password, String name) {
+
+        boolean changePassword = password != null && !password.isEmpty();
+
+        StringBuilder sql = new StringBuilder("UPDATE users SET email = ?, name = ?");
+        if (changePassword) {
+            sql.append(", password = ?");
+        }
+        sql.append(" WHERE id = ?");
+
+        try (Connection conn = DBManager.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+
+            int i = 1;
+            pstmt.setString(i++, email);
+            pstmt.setString(i++, name);
+            if (changePassword) {
+                pstmt.setString(i++, PasswordUtil.hash(password));
+            }
+            pstmt.setInt(i++, id);
+
+            return pstmt.executeUpdate() == 1;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
 }
