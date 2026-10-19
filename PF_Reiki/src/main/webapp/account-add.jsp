@@ -169,16 +169,16 @@ function toggleRole() {
     <div class="vertical">
 
         <label>ユーザー名</label>
-        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", "") %>">
+        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", "") %>" required>
 
         <label>メールアドレス</label>
-        <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", "") %>">
+        <input type="email" name="email" value="<%= HtmlUtil.paramOr(request, "email", "") %>" required>
 
         <label>名前</label>
-        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", "") %>">
+        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", "") %>" required>
 
         <label>パスワード（半角英数字（英字・数字を両方含む）と _ - で8〜32文字）</label>
-        <input type="password" name="password" autocomplete="new-password">
+        <input type="password" name="password" autocomplete="new-password" required>
 
     </div>
 

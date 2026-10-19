@@ -186,7 +186,7 @@ function toggleRole() {
         <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", eu.getUsername()) %>">
 
         <label>メールアドレス</label>
-        <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", eu.getEmail()) %>">
+        <input type="email" name="email" value="<%= HtmlUtil.paramOr(request, "email", eu.getEmail()) %>">
 
         <label>名前</label>
         <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", eu.getName()) %>">
