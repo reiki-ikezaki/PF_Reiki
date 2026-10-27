@@ -83,6 +83,12 @@ public class CreateUserServlet extends HttpServlet {
                 if (error == null) {
                     error = AccountValidator.validateImageSize(filePart.getSize());
                 }
+                if (error == null) {
+                    // 拡張子だけでなく、中身も画像か、Java側で確認する
+                    try (InputStream in = filePart.getInputStream()) {
+                        error = AccountValidator.validateImageContent(in.readNBytes(8));
+                    }
+                }
             }
             if (error == null) error = AccountValidator.validateFurigana(furigana);
             if (error == null) error = AccountValidator.validateGender(gender);

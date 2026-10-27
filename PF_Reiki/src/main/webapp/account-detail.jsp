@@ -82,14 +82,15 @@ async function sendLike(btn, targetUserId) {
     <div class="box"><p>ユーザーが見つかりません。</p></div>
 <% } else { %>
     <div class="box">
-        <img class="profile" src="profileImage?id=<%= u.getId() %>"
-             onerror="this.style.display='none';">
+        <% if (u.isHasImage()) { %>
+        <img class="profile" src="profileImage?id=<%= u.getId() %>">
+        <% } %>
 
         <p><b>名前:</b> <%= u.getName() %></p>
-        <p><b>フリガナ:</b> <%= u.getFurigana() %></p>
+        <p><b>ふりがな:</b> <%= u.getFurigana() %></p>
         <p><b>性別:</b> <%= HtmlUtil.genderLabel(u.getGender()) %></p>
         <p><b>年齢:</b> <%= u.getAge() %></p>
-        <p><b>自己紹介:</b><br><%= u.getBio() %></p>
+        <p><b>自己紹介:</b><br><%= HtmlUtil.escapeAndBr(u.getBio()) %></p>
         <p><b>いいね数:</b> <span id="likeCount"><%= likeCount %></span></p>
 
         <button type="button" class="like-btn" onclick="sendLike(this, <%= u.getId() %>)">いいね</button>

@@ -69,6 +69,8 @@ public class ProfileEditServlet extends HttpServlet {
                         }
                         imageBytes = out.toByteArray();
                     }
+                    // 拡張子だけでなく、中身も画像か、Java側で確認する
+                    error = AccountValidator.validateImageContent(imageBytes);
                 }
             }
 
@@ -108,6 +110,9 @@ public class ProfileEditServlet extends HttpServlet {
         user.setGender(gender);
         user.setAge(age);
         user.setBio(bio);
+        if (imageBytes != null) {
+            user.setHasImage(true);
+        }
         session.setAttribute("user", user);
 
         request.setAttribute("success", "プロフィールを更新しました！");

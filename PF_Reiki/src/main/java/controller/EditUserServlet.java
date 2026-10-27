@@ -78,7 +78,11 @@ public class EditUserServlet extends HttpServlet {
         String error = AccountValidator.validateRole(role);
         if (error == null) error = AccountValidator.validateStatus(status);
         if (error == null) error = AccountValidator.validateUsername(username);
-        if (error == null && dao.existsUsername(username, id)) {
+        // ユーザー名を「変更したとき」だけ、重複を確認する
+        // （すでに重複しているデータがあっても、ユーザー名を変えない編集は、できるようにする）
+        UserData current = dao.findById(id);
+        boolean usernameChanged = current == null || username == null || !username.equals(current.getUsername());
+        if (error == null && usernameChanged && dao.existsUsername(username, id)) {
             error = "このユーザー名は既に使われています。";
         }
         if (error == null) error = AccountValidator.validateEmail(email);
@@ -101,6 +105,12 @@ public class EditUserServlet extends HttpServlet {
                 error = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
                 if (error == null) {
                     error = AccountValidator.validateImageSize(filePart.getSize());
+                }
+                if (error == null) {
+                    // 拡張子だけでなく、中身も画像か、Java側で確認する
+                    try (InputStream in = filePart.getInputStream()) {
+                        error = AccountValidator.validateImageContent(in.readNBytes(8));
+                    }
                 }
             }
             if (error == null) error = AccountValidator.validateFurigana(furigana);

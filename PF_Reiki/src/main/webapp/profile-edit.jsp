@@ -161,16 +161,17 @@
 
 
         <label>プロフィール画像（jpg/png/gif・2MB以下）</label><br>
+        <% if (me.isHasImage()) { %>
         <img src="profileImage?id=<%= me.getId() %>"
-             style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0;"
-             onerror="this.style.display='none';">
+             style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0;">
+        <% } %>
         <br>
         <input type="file" name="profileImage" accept="image/*">
 
         <label>名前</label>
         <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", me.getName()) %>">
 
-        <label>フリガナ（ひらがなのみ）</label>
+        <label>ふりがな（ひらがなのみ）</label>
         <input type="text" name="furigana" value="<%= HtmlUtil.paramOr(request, "furigana", me.getFurigana()) %>">
 
         <label>性別</label>

@@ -9,7 +9,7 @@ public class UserData {
     private String name;
     private String role;
     private String status;
-    private String profileImage;
+    private boolean hasImage;   // プロフィール画像が登録されているか（画像そのものは、持たない）
     private String bio;
     private int age;
     private String gender;
@@ -42,8 +42,8 @@ public class UserData {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
-    public String getProfileImage() { return profileImage; }
-    public void setProfileImage(String profileImage) { this.profileImage = profileImage; }
+    public boolean isHasImage() { return hasImage; }
+    public void setHasImage(boolean hasImage) { this.hasImage = hasImage; }
 
     public String getBio() { return bio; }
     public void setBio(String bio) { this.bio = bio; }

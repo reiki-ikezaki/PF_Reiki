@@ -200,9 +200,10 @@ function toggleRole() {
     <div id="userFields" class="vertical" style="<%= "user".equals(fRole) ? "" : "display:none;" %>">
 
         <label>プロフィール画像</label>
+        <% if (eu.isHasImage()) { %>
         <img src="profileImage?id=<%= eu.getId() %>"
-             style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0; display:block;"
-             onerror="this.style.display='none';">
+             style="width:100px; height:100px; object-fit:cover; border-radius:8px; border:1px solid #ccc; margin:6px 0; display:block;">
+        <% } %>
         <label>変更する場合のみ選択（jpg / jpeg / png / gif・2MB以下）</label>
         <input type="file" name="profileImage" id="profileImageInput" accept="image/*">
         <div id="fileError" style="color:red; margin-top:6px;"></div>

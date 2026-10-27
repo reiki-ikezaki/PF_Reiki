@@ -17,7 +17,8 @@ public class UserDao {
 
         try (Connection conn = DBManager.getConnection()) {
 
-            String sql = "SELECT * FROM users WHERE username = ?";
+            String sql = "SELECT *, (profile_image IS NOT NULL AND LENGTH(profile_image) > 0) AS has_image "
+                       + "FROM users WHERE username = ?";
             PreparedStatement pStmt = conn.prepareStatement(sql);
 
             pStmt.setString(1, username);
@@ -46,7 +47,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image"));
+                user.setHasImage(rs.getBoolean("has_image"));
                 user.setBio(rs.getString("bio"));
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
@@ -148,13 +149,19 @@ public class UserDao {
     public boolean updateAccount(UserData user, String password, byte[] imageBytes) {
         boolean changePassword = password != null && !password.isEmpty();
 
+        // 管理者には一般項目（ふりがな・性別・年齢・自己紹介・画像）がない。
+        // 管理者として保存するときは、画像も一緒に消す（他の項目と同じ扱いにする）。
+        boolean isAdmin = "admin".equals(user.getRole());
+
         StringBuilder sql = new StringBuilder(
                 "UPDATE users SET role = ?, status = ?, username = ?, email = ?, name = ?, "
                         + "furigana = ?, gender = ?, age = ?, bio = ?");
         if (changePassword) {
             sql.append(", password = ?");
         }
-        if (imageBytes != null) {
+        if (isAdmin) {
+            sql.append(", profile_image = NULL");
+        } else if (imageBytes != null) {
             sql.append(", profile_image = ?");
         }
         sql.append(" WHERE id = ?");
@@ -175,7 +182,7 @@ public class UserDao {
             if (changePassword) {
                 pstmt.setString(i++, PasswordUtil.hash(password));
             }
-            if (imageBytes != null) {
+            if (!isAdmin && imageBytes != null) {
                 pstmt.setBytes(i++, imageBytes);
             }
             pstmt.setInt(i++, user.getId());
@@ -225,7 +232,8 @@ public class UserDao {
     public UserData findById(int id) {
         UserData user = null;
 
-        String sql = "SELECT * FROM users WHERE id = ?";
+        String sql = "SELECT *, (profile_image IS NOT NULL AND LENGTH(profile_image) > 0) AS has_image "
+                   + "FROM users WHERE id = ?";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -242,7 +250,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image"));
+                user.setHasImage(rs.getBoolean("has_image"));
                 user.setBio(rs.getString("bio"));
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
@@ -261,7 +269,8 @@ public class UserDao {
     public List<UserData> findPage(int offset, int limit) {
         List<UserData> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM users WHERE status != 'deleted' ORDER BY id LIMIT ? OFFSET ?";
+        String sql = "SELECT *, (profile_image IS NOT NULL AND LENGTH(profile_image) > 0) AS has_image "
+                   + "FROM users WHERE status != 'deleted' ORDER BY id LIMIT ? OFFSET ?";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -280,7 +289,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image"));
+                user.setHasImage(rs.getBoolean("has_image"));
                 user.setBio(rs.getString("bio"));
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
@@ -379,7 +388,8 @@ public class UserDao {
     public List<UserData> findDeletedUsers() {
         List<UserData> list = new ArrayList<>();
 
-        String sql = "SELECT * FROM users WHERE status = 'deleted' ORDER BY id";
+        String sql = "SELECT *, (profile_image IS NOT NULL AND LENGTH(profile_image) > 0) AS has_image "
+                   + "FROM users WHERE status = 'deleted' ORDER BY id";
 
         try (Connection conn = DBManager.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -394,7 +404,7 @@ public class UserDao {
                 user.setName(rs.getString("name"));
                 user.setRole(rs.getString("role"));
                 user.setStatus(rs.getString("status"));
-                user.setProfileImage(rs.getString("profile_image"));
+                user.setHasImage(rs.getBoolean("has_image"));
                 user.setBio(rs.getString("bio"));
                 user.setAge(rs.getInt("age"));
                 user.setGender(rs.getString("gender"));
@@ -445,6 +455,7 @@ public class UserDao {
         List<UserData> list = new ArrayList<>();
 
         String sql = "SELECT u.id, u.username, u.name, u.email, u.furigana, u.gender, u.age, u.bio, "
+                   + "(u.profile_image IS NOT NULL AND LENGTH(u.profile_image) > 0) AS has_image, "
                    + "(SELECT COUNT(*) FROM likes l WHERE l.target_user_id = u.id "
                    + "AND YEAR(l.created_at) = YEAR(CURDATE()) AND MONTH(l.created_at) = MONTH(CURDATE())) "
                    + "AS like_count "
@@ -466,6 +477,7 @@ public class UserDao {
                 u.setGender(rs.getString("gender"));
                 u.setAge(rs.getInt("age"));
                 u.setBio(rs.getString("bio"));
+                u.setHasImage(rs.getBoolean("has_image"));
                 u.setLikeCount(rs.getInt("like_count"));
                 list.add(u);
             }
@@ -484,6 +496,7 @@ public class UserDao {
         List<UserData> list = new ArrayList<>();
 
         String sql = "SELECT u.id, u.username, u.name, u.email, u.furigana, u.gender, u.age, u.bio, "
+                   + "(u.profile_image IS NOT NULL AND LENGTH(u.profile_image) > 0) AS has_image, "
                    + "(SELECT COUNT(*) FROM likes l WHERE l.target_user_id = u.id "
                    + "AND YEAR(l.created_at) = YEAR(CURDATE()) AND MONTH(l.created_at) = MONTH(CURDATE())) "
                    + "AS like_count "
@@ -505,6 +518,7 @@ public class UserDao {
                 u.setGender(rs.getString("gender"));
                 u.setAge(rs.getInt("age"));
                 u.setBio(rs.getString("bio"));
+                u.setHasImage(rs.getBoolean("has_image"));
                 u.setLikeCount(rs.getInt("like_count"));
                 list.add(u);
             }

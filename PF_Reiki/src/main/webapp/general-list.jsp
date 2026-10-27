@@ -67,15 +67,16 @@
         <tr>
             <td><%= u.getId() %></td>
             <td>
+                <% if (u.isHasImage()) { %>
                 <img src="profileImage?id=<%= u.getId() %>"
-                     style="width:60px; max-width:100%; height:auto; aspect-ratio:1/1; box-sizing:border-box; object-fit:cover; border-radius:8px; border:1px solid #ccc;"
-                     onerror="this.style.display='none';">
+                     style="width:60px; max-width:100%; height:auto; aspect-ratio:1/1; box-sizing:border-box; object-fit:cover; border-radius:8px; border:1px solid #ccc;">
+                <% } %>
             </td>
             <td><%= u.getName() %></td>
             <td><%= u.getFurigana() %></td>
             <td><%= HtmlUtil.genderLabel(u.getGender()) %></td>
             <td><%= u.getAge() %></td>
-            <td><%= u.getBio() %></td>
+            <td><%= HtmlUtil.escapeAndBr(u.getBio()) %></td>
             <td><a class="detail-link" href="accountDetail?id=<%= u.getId() %>&from=general-list">詳細</a></td>
         </tr>
         <%

@@ -49,8 +49,19 @@ public class CategoryEditServlet extends HttpServlet {
             return;
         }
 
+        // 更新に失敗したとき（DB側の列の長さが足りない場合など）は、エラーを表示して、入力内容を残す
         CategoryDao dao = new CategoryDao();
-        dao.update(id, name);
+        if (!dao.update(id, name)) {
+            request.setAttribute("error", "更新に失敗しました。");
+
+            Category c = new Category();
+            c.setId(id);
+            c.setName(name);
+            request.setAttribute("category", c);
+
+            request.getRequestDispatcher("/category_edit.jsp").forward(request, response);
+            return;
+        }
 
         response.sendRedirect("categoryList");
     }

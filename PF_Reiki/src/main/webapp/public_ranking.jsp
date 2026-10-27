@@ -192,14 +192,15 @@ document.addEventListener("visibilitychange", function () {
     %>
         <div class="user-card" data-user-id="<%= u.getId() %>">
             <p class="rank"><%= rank++ %> 位</p>
+            <% if (u.isHasImage()) { %>
             <img src="profileImage?id=<%= u.getId() %>"
-                 style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #ccc; display:block; margin-bottom:8px;"
-                 onerror="this.style.display='none';">
+                 style="width:80px; height:80px; object-fit:cover; border-radius:8px; border:1px solid #ccc; display:block; margin-bottom:8px;">
+            <% } %>
             <p><b>ユーザー名:</b> <%= HtmlUtil.escape(u.getUsername()) %></p>
             <p><b>ふりがな:</b> <%= HtmlUtil.escape(u.getFurigana()) %></p>
             <p><b>性別:</b> <%= HtmlUtil.genderLabel(u.getGender()) %></p>
             <p><b>年齢:</b> <%= u.getAge() %></p>
-            <p><b>自己紹介:</b> <%= HtmlUtil.escape(u.getBio()) %></p>
+            <p><b>自己紹介:</b> <%= HtmlUtil.escapeAndBr(u.getBio()) %></p>
 
             <p><b>今月のいいね数:</b> <span class="like-count" id="likeCount-<%= u.getId() %>"><%= u.getLikeCount() %></span></p>
 

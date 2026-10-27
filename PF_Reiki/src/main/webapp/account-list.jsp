@@ -202,8 +202,7 @@
             <!-- ★ 画像列（貼るだけで完成する強化版） -->
             <td>
                 <%
-                    String img = u.getProfileImage();
-                    if (img != null && !img.isEmpty()) {
+                    if (u.isHasImage()) {
                 %>
                     <img src="profileImage?id=<%= u.getId() %>"
                          style="width:80px; max-width:100%; height:auto; aspect-ratio:1/1; box-sizing:border-box; object-fit:cover; border-radius:8px; border:1px solid #ccc;">

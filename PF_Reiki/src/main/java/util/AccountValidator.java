@@ -131,6 +131,22 @@ public class AccountValidator {
         return null;
     }
 
+    // 画像の「中身」が、本当に JPEG / PNG / GIF かを、ファイルの先頭の数バイトで確認する。
+    // （拡張子だけを変えた、画像でないファイルを、ブラウザ側のチェックに頼らず、Java側で防ぐ）
+    public static String validateImageContent(byte[] head) {
+        String message = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+        if (head == null || head.length < 6) {
+            return message;
+        }
+        boolean jpeg = (head[0] & 0xFF) == 0xFF && (head[1] & 0xFF) == 0xD8 && (head[2] & 0xFF) == 0xFF;
+        boolean png = head.length >= 8
+                && (head[0] & 0xFF) == 0x89 && head[1] == 'P' && head[2] == 'N' && head[3] == 'G'
+                && head[4] == 0x0D && head[5] == 0x0A && head[6] == 0x1A && head[7] == 0x0A;
+        boolean gif = head[0] == 'G' && head[1] == 'I' && head[2] == 'F' && head[3] == '8'
+                && (head[4] == '7' || head[4] == '9') && head[5] == 'a';
+        return (jpeg || png || gif) ? null : message;
+    }
+
     public static String validateImageExtension(String filename) {
         if (filename == null) {
             return "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";

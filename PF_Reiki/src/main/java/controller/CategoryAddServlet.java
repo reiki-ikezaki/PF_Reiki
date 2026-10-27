@@ -35,8 +35,14 @@ public class CategoryAddServlet extends HttpServlet {
             return;
         }
 
+        // 登録に失敗したとき（DB側の列の長さが足りない場合など）は、エラーを表示して、入力内容を残す
         CategoryDao dao = new CategoryDao();
-        dao.insert(name);
+        if (!dao.insert(name)) {
+            request.setAttribute("error", "登録に失敗しました。");
+            request.setAttribute("name", name);
+            request.getRequestDispatcher("/category_add.jsp").forward(request, response);
+            return;
+        }
 
         response.sendRedirect("categoryList");
     }
