@@ -245,5 +245,30 @@ function toggleRole() {
     toggleRole();
 </script>
 
+<script>
+    // 画像を選んだ時点で、すぐに知らせる（拡張子・2MB）。表示場所は、他の入力エラーと同じ欄。
+    // ※ 最終的な判定は、保存時に、Java（AccountValidator）で必ず行う。
+    document.querySelector("input[name='profileImage']").addEventListener("change", function (e) {
+        var file = e.target.files[0];
+        var errorBox = document.querySelector(".msg");
+        if (!file) { errorBox.textContent = ""; return; }
+
+        var ext = file.name.split(".").pop().toLowerCase();
+        if (["jpg", "jpeg", "png", "gif"].indexOf(ext) === -1) {
+            errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
+            e.target.value = "";   // 選択を解除する
+            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            return;
+        }
+        if (file.size > 2 * 1024 * 1024) {
+            errorBox.textContent = "プロフィール画像は2MB以下にしてください。";
+            e.target.value = "";   // 選択を解除する
+            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            return;
+        }
+        errorBox.textContent = "";
+    });
+</script>
+
 </body>
 </html>
