@@ -97,7 +97,7 @@ async function sendLike(btn, targetUserId) {
         <div class="like-msg" id="likeMsg"></div>
 
         <br>
-        <a class="back-link" href="<%= backUrl %>">← 一覧に戻る</a>
+        <a class="back-link" href="<%= backUrl %>">戻る</a>
     </div>
 <% } %>
 
