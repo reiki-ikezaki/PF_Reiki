@@ -196,35 +196,5 @@
     </div>
 </div>
 
-<!-- ファイル選択時に即エラー表示するスクリプト -->
-<script>
-document.querySelector("input[name='profileImage']").addEventListener("change", function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const errorBox = document.querySelector(".msg.error");
-
-    // ▼ 拡張子チェック
-    const validExt = ["jpg", "jpeg", "png", "gif"];
-    const ext = file.name.split(".").pop().toLowerCase();
-
-    if (!validExt.includes(ext)) {
-        errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
-        e.target.value = ""; // 選択解除
-        return;
-    }
-
-    // ▼ 2MBチェック
-    if (file.size > 1024 * 1024 * 2) {
-        errorBox.textContent = "画像は2MB以下にしてください。";
-        e.target.value = ""; // 選択解除
-        return;
-    }
-
-    // ▼ 問題なし → エラー消す
-    errorBox.textContent = "";
-});
-</script>
-
 </body>
 </html>

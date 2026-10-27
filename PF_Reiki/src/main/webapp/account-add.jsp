@@ -187,7 +187,6 @@ function toggleRole() {
 
         <label>プロフィール画像（jpg / jpeg / png / gif・2MB以下）</label>
         <input type="file" name="profileImage" id="profileImageInput" accept="image/*">
-        <div id="fileError" style="color:red; margin-top:6px;"></div>
 
         <label>ふりがな（ひらがなのみ）</label>
         <input type="text" name="furigana" value="<%= HtmlUtil.paramOr(request, "furigana", "") %>">
@@ -223,31 +222,6 @@ function toggleRole() {
 <script>
     // 初期表示時に role に応じて切り替え
     toggleRole();
-
-    // プロフィール画像の即時チェック（拡張子・2MB）
-    document.getElementById("profileImageInput").addEventListener("change", function (e) {
-        var file = e.target.files[0];
-        var errorBox = document.getElementById("fileError");
-
-        if (!file) { errorBox.textContent = ""; return; }
-
-        var validExt = ["jpg", "jpeg", "png", "gif"];
-        var ext = file.name.split(".").pop().toLowerCase();
-
-        if (validExt.indexOf(ext) === -1) {
-            errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
-            e.target.value = "";
-            return;
-        }
-
-        if (file.size > 1024 * 1024 * 2) {
-            errorBox.textContent = "プロフィール画像は2MB以下にしてください。";
-            e.target.value = "";
-            return;
-        }
-
-        errorBox.textContent = "";
-    });
 </script>
 
 </body>
