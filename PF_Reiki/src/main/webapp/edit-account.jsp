@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="model.UserData" %>
+<%@ page import="java.util.List" %>
 <%@ page import="util.HtmlUtil" %>
 <!DOCTYPE html>
 <html>
@@ -131,7 +132,10 @@ function toggleRole() {
 
 <h1>アカウント編集</h1>
 
-<div class="msg" style="color:red;">${error}</div>
+<div class="msg" style="color:red;">${error}<%
+    List<String> errs = (List<String>) request.getAttribute("errors");
+    if (errs != null) { for (String m : errs) {
+%><div><%= HtmlUtil.escape(m) %></div><% } } %></div>
 
 <%
     // 編集対象のアカウント（無ければ案内を出す）
@@ -186,7 +190,7 @@ function toggleRole() {
         <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", eu.getUsername()) %>">
 
         <label>メールアドレス</label>
-        <input type="email" name="email" value="<%= HtmlUtil.paramOr(request, "email", eu.getEmail()) %>">
+        <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", eu.getEmail()) %>">
 
         <label>名前</label>
         <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", eu.getName()) %>">

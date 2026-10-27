@@ -1,6 +1,8 @@
 package controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -42,13 +44,16 @@ public class SettingsServlet extends HttpServlet {
         String password = request.getParameter("password");   // 空なら変更しない
         String name = request.getParameter("name");           // 管理者だけが使う
 
-        // 検証：メールアドレス・パスワード（管理者は、名前も）
-        String error = AccountValidator.validateEmail(email);
-        if (error == null) error = AccountValidator.validatePassword(password);
-        if (error == null && isAdmin) error = AccountValidator.validateName(name);
+        // 検証：メールアドレス・パスワード（管理者は、名前も）。全項目を検査し、エラーをまとめて表示する。
+        List<String> errors = new ArrayList<>();
+        AccountValidator.addIfError(errors, AccountValidator.validateEmail(email));
+        AccountValidator.addIfError(errors, AccountValidator.validatePassword(password));
+        if (isAdmin) {
+            AccountValidator.addIfError(errors, AccountValidator.validateName(name));
+        }
 
-        if (error != null) {
-            showError(request, response, error);
+        if (!errors.isEmpty()) {
+            showError(request, response, errors);
             return;
         }
 
@@ -78,7 +83,12 @@ public class SettingsServlet extends HttpServlet {
 
     private void showError(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
-        request.setAttribute("error", message);
+        showError(request, response, List.of(message));
+    }
+
+    private void showError(HttpServletRequest request, HttpServletResponse response, List<String> errors)
+            throws ServletException, IOException {
+        request.setAttribute("errors", errors);
         request.getRequestDispatcher("settings.jsp").forward(request, response);
     }
 }

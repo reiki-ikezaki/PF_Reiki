@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
 <%@ page import="util.HtmlUtil" %>
 <!DOCTYPE html>
 <html>
@@ -130,7 +131,10 @@ function toggleRole() {
 
 <h1>アカウント追加</h1>
 
-<div class="msg" style="color:red;">${error}</div>
+<div class="msg" style="color:red;">${error}<%
+    List<String> errs = (List<String>) request.getAttribute("errors");
+    if (errs != null) { for (String m : errs) {
+%><div><%= HtmlUtil.escape(m) %></div><% } } %></div>
 
 <%
     // エラーで戻ってきたとき、入力内容を消さないために、送信された値を取り出す
@@ -169,16 +173,16 @@ function toggleRole() {
     <div class="vertical">
 
         <label>ユーザー名</label>
-        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", "") %>" required>
+        <input type="text" name="username" value="<%= HtmlUtil.paramOr(request, "username", "") %>">
 
         <label>メールアドレス</label>
-        <input type="email" name="email" value="<%= HtmlUtil.paramOr(request, "email", "") %>" required>
+        <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", "") %>">
 
         <label>名前</label>
-        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", "") %>" required>
+        <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", "") %>">
 
         <label>パスワード（半角英数字（英字・数字を両方含む）と _ - で8〜32文字）</label>
-        <input type="password" name="password" autocomplete="new-password" required>
+        <input type="password" name="password" autocomplete="new-password">
 
     </div>
 

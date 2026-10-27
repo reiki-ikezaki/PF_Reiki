@@ -3,6 +3,8 @@ package controller;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -45,21 +47,22 @@ public class ProfileEditServlet extends HttpServlet {
         String ageStr = request.getParameter("age");
         String bio = request.getParameter("bio");
 
-        // 検証は、画面の上から下の並び順で行い、最初に見つかった1件のエラーを表示する。
+        // 検証は、画面の上から下の並び順で、全項目を行い、エラーをまとめて表示する。
         //   画面の並び：プロフィール画像 → 名前 → ふりがな → 性別 → 年齢 → 自己紹介
 
         // ① プロフィール画像の検証（選択されたときだけ）
-        String error = null;
+        List<String> errors = new ArrayList<>();
+        String imageError = null;
         byte[] imageBytes = null;
 
         try {
             Part part = request.getPart("profileImage");
 
             if (part != null && part.getSize() > 0) {
-                error = AccountValidator.validateImageExtension(part.getSubmittedFileName());
-                if (error == null) error = AccountValidator.validateImageSize(part.getSize());
+                imageError = AccountValidator.validateImageExtension(part.getSubmittedFileName());
+                if (imageError == null) imageError = AccountValidator.validateImageSize(part.getSize());
 
-                if (error == null) {
+                if (imageError == null) {
                     try (InputStream in = part.getInputStream();
                          ByteArrayOutputStream out = new ByteArrayOutputStream()) {
                         byte[] buf = new byte[8192];
@@ -70,23 +73,24 @@ public class ProfileEditServlet extends HttpServlet {
                         imageBytes = out.toByteArray();
                     }
                     // 拡張子だけでなく、中身も画像か、Java側で確認する
-                    error = AccountValidator.validateImageContent(imageBytes);
+                    imageError = AccountValidator.validateImageContent(imageBytes);
                 }
             }
 
         } catch (Exception e) {
-            error = "プロフィール画像は2MB以下にしてください。";
+            imageError = "プロフィール画像は2MB以下にしてください。";
         }
+        AccountValidator.addIfError(errors, imageError);
 
         // ② 名前・ふりがな・性別・年齢・自己紹介の検証
-        if (error == null) error = AccountValidator.validateName(name);
-        if (error == null) error = AccountValidator.validateFurigana(furigana);
-        if (error == null) error = AccountValidator.validateGender(gender);
-        if (error == null) error = AccountValidator.validateAge(ageStr);
-        if (error == null) error = AccountValidator.validateBio(bio);
+        AccountValidator.addIfError(errors, AccountValidator.validateName(name));
+        AccountValidator.addIfError(errors, AccountValidator.validateFurigana(furigana));
+        AccountValidator.addIfError(errors, AccountValidator.validateGender(gender));
+        AccountValidator.addIfError(errors, AccountValidator.validateAge(ageStr));
+        AccountValidator.addIfError(errors, AccountValidator.validateBio(bio));
 
-        if (error != null) {
-            showError(request, response, error);
+        if (!errors.isEmpty()) {
+            showError(request, response, errors);
             return;
         }
 
@@ -121,7 +125,12 @@ public class ProfileEditServlet extends HttpServlet {
 
     private void showError(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
-        request.setAttribute("error", message);
+        showError(request, response, List.of(message));
+    }
+
+    private void showError(HttpServletRequest request, HttpServletResponse response, List<String> errors)
+            throws ServletException, IOException {
+        request.setAttribute("errors", errors);
         forward(request, response);
     }
 

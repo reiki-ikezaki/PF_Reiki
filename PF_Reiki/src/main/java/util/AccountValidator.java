@@ -1,5 +1,6 @@
 package util;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class AccountValidator {
@@ -18,6 +19,14 @@ public class AccountValidator {
             Pattern.compile("^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9_-]{8,32}$");
 
     private AccountValidator() {
+    }
+
+    // 検査の結果がエラー（nullでない）なら、一覧に追加する。
+    // 1件目で止めず、全項目を検査して、エラーをまとめて集めるために使う。
+    public static void addIfError(List<String> errors, String message) {
+        if (message != null) {
+            errors.add(message);
+        }
     }
 
     // 権限は「一般 / 管理者」の2択（ラジオボタン以外の値が来たらエラー）

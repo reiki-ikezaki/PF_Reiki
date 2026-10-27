@@ -2,6 +2,8 @@ package controller;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -48,23 +50,26 @@ public class CreateUserServlet extends HttpServlet {
 
         boolean isAdmin = "admin".equals(role);
 
-        // 検証は、画面の上から下の並び順で行い、最初に見つかった1件のエラーを表示する。
+        // 検証は、画面の上から下の並び順で、全項目を行い、エラーをまとめて表示する。
         //   画面の並び：ユーザー種別 → ステータス → ユーザー名 → メール → 名前 → パスワード
         //               →（一般のみ）画像 → ふりがな → 性別 → 年齢 → 自己紹介
 
         // ① 共通項目の検証（管理者・一般 どちらでも必要）
-        String error = AccountValidator.validateRole(role);
-        if (error == null) error = AccountValidator.validateStatus(status);
-        if (error == null) error = AccountValidator.validateUsername(username);
-        if (error == null && new UserDao().existsUsername(username, 0)) {
-            error = "このユーザー名は既に使われています。";
+        List<String> errors = new ArrayList<>();
+        AccountValidator.addIfError(errors, AccountValidator.validateRole(role));
+        AccountValidator.addIfError(errors, AccountValidator.validateStatus(status));
+        String usernameError = AccountValidator.validateUsername(username);
+        AccountValidator.addIfError(errors, usernameError);
+        if (usernameError == null && new UserDao().existsUsername(username, 0)) {
+            errors.add("このユーザー名は既に使われています。");
         }
-        if (error == null) error = AccountValidator.validateEmail(email);
-        if (error == null) error = AccountValidator.validateName(name);
-        if (error == null && (password == null || password.isEmpty())) {
-            error = "パスワードを入力してください。";
+        AccountValidator.addIfError(errors, AccountValidator.validateEmail(email));
+        AccountValidator.addIfError(errors, AccountValidator.validateName(name));
+        if (password == null || password.isEmpty()) {
+            errors.add("パスワードを入力してください。");
+        } else {
+            AccountValidator.addIfError(errors, AccountValidator.validatePassword(password));
         }
-        if (error == null) error = AccountValidator.validatePassword(password);
 
         // ② 一般項目の検証（一般ユーザーを追加するときだけ）
         String furigana = null;
@@ -78,26 +83,27 @@ public class CreateUserServlet extends HttpServlet {
             ageStr = request.getParameter("age");
             bio = request.getParameter("bio");
 
-            if (error == null && filePart != null && filePart.getSize() > 0) {
-                error = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
-                if (error == null) {
-                    error = AccountValidator.validateImageSize(filePart.getSize());
+            if (filePart != null && filePart.getSize() > 0) {
+                String imageError = AccountValidator.validateImageExtension(filePart.getSubmittedFileName());
+                if (imageError == null) {
+                    imageError = AccountValidator.validateImageSize(filePart.getSize());
                 }
-                if (error == null) {
+                if (imageError == null) {
                     // 拡張子だけでなく、中身も画像か、Java側で確認する
                     try (InputStream in = filePart.getInputStream()) {
-                        error = AccountValidator.validateImageContent(in.readNBytes(8));
+                        imageError = AccountValidator.validateImageContent(in.readNBytes(8));
                     }
                 }
+                AccountValidator.addIfError(errors, imageError);
             }
-            if (error == null) error = AccountValidator.validateFurigana(furigana);
-            if (error == null) error = AccountValidator.validateGender(gender);
-            if (error == null) error = AccountValidator.validateAge(ageStr);
-            if (error == null) error = AccountValidator.validateBio(bio);
+            AccountValidator.addIfError(errors, AccountValidator.validateFurigana(furigana));
+            AccountValidator.addIfError(errors, AccountValidator.validateGender(gender));
+            AccountValidator.addIfError(errors, AccountValidator.validateAge(ageStr));
+            AccountValidator.addIfError(errors, AccountValidator.validateBio(bio));
         }
 
-        if (error != null) {
-            showError(request, response, error);
+        if (!errors.isEmpty()) {
+            showError(request, response, errors);
             return;
         }
 
@@ -141,12 +147,17 @@ public class CreateUserServlet extends HttpServlet {
     // それを入力欄に戻す（入力内容が消えない）。
     private void showError(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
+        showError(request, response, List.of(message));
+    }
+
+    private void showError(HttpServletRequest request, HttpServletResponse response, List<String> errors)
+            throws ServletException, IOException {
         // 原因調査用のログ（入力値そのものは出さず、届いた項目名だけを記録する）
-        getServletContext().log("[アカウント追加] エラー: " + message
+        getServletContext().log("[アカウント追加] エラー: " + errors
                 + " / Content-Type=" + request.getContentType()
                 + " / 届いた項目=" + request.getParameterMap().keySet());
 
-        request.setAttribute("error", message);
+        request.setAttribute("errors", errors);
         request.getRequestDispatcher("account-add.jsp").forward(request, response);
     }
 }

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ page import="model.UserData" %>
+<%@ page import="java.util.List" %>
 <%@ page import="util.HtmlUtil" %>
 
 <!DOCTYPE html>
@@ -145,7 +146,10 @@
 
     <form action="settings" method="post">
 
-        <div class="msg error">${error}</div>
+        <div class="msg error">${error}<%
+    List<String> errs = (List<String>) request.getAttribute("errors");
+    if (errs != null) { for (String m : errs) {
+%><div><%= HtmlUtil.escape(m) %></div><% } } %></div>
         <div class="msg success">${success}</div>
 
 
