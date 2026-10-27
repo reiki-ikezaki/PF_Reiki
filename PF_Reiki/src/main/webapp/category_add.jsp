@@ -37,7 +37,6 @@
 
         <form action="categoryAdd" method="post">
             <label>カテゴリ名：</label><br>
-            <!-- エラーで戻ってきたときは、入力した内容を残す -->
             <input type="text" name="name" value="<%= HtmlUtil.escape((String) request.getAttribute("name")) %>" style="width:100%; padding:8px;"><br><br>
 
             <button class="btn" type="submit">登録</button>

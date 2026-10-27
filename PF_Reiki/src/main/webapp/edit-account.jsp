@@ -118,7 +118,6 @@ function toggleRole() {
     const userFields = document.getElementById("userFields");
     userFields.style.display = isAdmin ? "none" : "block";
 
-    // 管理者のときは、一般項目を送信しない（disabled の入力欄は、送信されない）
     userFields.querySelectorAll("input, select, textarea").forEach(function (el) {
         el.disabled = isAdmin;
     });
@@ -138,7 +137,6 @@ function toggleRole() {
 %><div><%= HtmlUtil.escape(m) %></div><% } } %></div>
 
 <%
-    // 編集対象のアカウント（無ければ案内を出す）
     UserData eu = (UserData) request.getAttribute("user");
     if (eu == null) {
 %>
@@ -146,8 +144,6 @@ function toggleRole() {
     <a href="accountList" class="back-link">アカウント一覧に戻る</a>
 <%
     } else {
-        // エラーで戻ってきたときは、送信された値を表示する（入力内容を消さない）。
-        // 送信された値が無いとき（初めて開いたとき）は、DBの値を表示する。
         String fRole   = HtmlUtil.paramOr(request, "role",   eu.getRole());
         String fStatus = HtmlUtil.paramOr(request, "status", eu.getStatus());
         String fGender = HtmlUtil.paramOr(request, "gender", eu.getGender());
@@ -156,10 +152,8 @@ function toggleRole() {
 
 <form action="editUser" method="post" enctype="multipart/form-data">
 
-    <!-- ▼ ID（編集時は変更不可） -->
     <input type="hidden" name="id" value="<%= eu.getId() %>">
 
-    <!-- ▼ ユーザー種別 -->
     <div class="vertical">
         <label>ユーザー種別</label>
         <div class="radio-group">
@@ -174,7 +168,6 @@ function toggleRole() {
         </div>
     </div>
 
-    <!-- ▼ ステータス -->
     <div class="vertical">
         <label>ステータス</label>
         <div class="radio-group">
@@ -183,7 +176,6 @@ function toggleRole() {
         </div>
     </div>
 
-    <!-- ▼ 共通項目（管理者・一般どちらも必須）：ユーザー名・メール・名前・パスワード -->
     <div class="vertical">
 
         <label>ユーザー名</label>
@@ -200,7 +192,6 @@ function toggleRole() {
 
     </div>
 
-    <!-- ▼ 一般ユーザー項目（管理者を選ぶと非表示になり、送信もされない） -->
     <div id="userFields" class="vertical" style="<%= "user".equals(fRole) ? "" : "display:none;" %>">
 
         <label>プロフィール画像</label>
@@ -229,7 +220,6 @@ function toggleRole() {
 
     </div>
 
-    <!-- ▼ 管理者項目（共通項目のみ。追加の入力欄は無い） -->
     <div id="adminFields" class="vertical" style="<%= "admin".equals(fRole) ? "" : "display:none;" %>">
     </div>
 
@@ -245,13 +235,10 @@ function toggleRole() {
 </div>
 
 <script>
-    // 初期表示時に role に応じて切り替え
     toggleRole();
 </script>
 
 <script>
-    // 画像を選んだ時点で、すぐに知らせる（拡張子・2MB）。表示場所は、他の入力エラーと同じ欄。
-    // ※ 最終的な判定は、保存時に、Java（AccountValidator）で必ず行う。
     document.querySelector("input[name='profileImage']").addEventListener("change", function (e) {
         var file = e.target.files[0];
         var errorBox = document.querySelector(".msg");
@@ -260,14 +247,14 @@ function toggleRole() {
         var ext = file.name.split(".").pop().toLowerCase();
         if (["jpg", "jpeg", "png", "gif"].indexOf(ext) === -1) {
             errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
-            e.target.value = "";   // 選択を解除する
-            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            e.target.value = "";
+            errorBox.scrollIntoView({ block: "center" });
             return;
         }
         if (file.size > 2 * 1024 * 1024) {
             errorBox.textContent = "プロフィール画像は2MB以下にしてください。";
-            e.target.value = "";   // 選択を解除する
-            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            e.target.value = "";
+            errorBox.scrollIntoView({ block: "center" });
             return;
         }
         errorBox.textContent = "";

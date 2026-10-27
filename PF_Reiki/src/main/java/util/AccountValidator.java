@@ -14,22 +14,18 @@ public class AccountValidator {
     private static final Pattern AGE_PATTERN =
             Pattern.compile("^[0-9]{1,3}$");
 
-    // 英字1文字以上・数字1文字以上を必須にする（英字のみ／数字のみは不可）
     private static final Pattern PASSWORD_PATTERN =
             Pattern.compile("^(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9_-]{8,32}$");
 
     private AccountValidator() {
     }
 
-    // 検査の結果がエラー（nullでない）なら、一覧に追加する。
-    // 1件目で止めず、全項目を検査して、エラーをまとめて集めるために使う。
     public static void addIfError(List<String> errors, String message) {
         if (message != null) {
             errors.add(message);
         }
     }
 
-    // 権限は「一般 / 管理者」の2択（ラジオボタン以外の値が来たらエラー）
     public static String validateRole(String role) {
         if (!"user".equals(role) && !"admin".equals(role)) {
             return "ユーザー種別の値が不正です。";
@@ -37,7 +33,6 @@ public class AccountValidator {
         return null;
     }
 
-    // ステータスは「有効 / アクセス禁止」の2択
     public static String validateStatus(String status) {
         if (!"active".equals(status) && !"banned".equals(status)) {
             return "ステータスの値が不正です。";
@@ -45,7 +40,6 @@ public class AccountValidator {
         return null;
     }
 
-    // ユーザー名：必須・255文字以内
     public static String validateUsername(String username) {
         if (username == null || username.trim().isEmpty()) {
             return "ユーザー名を入力してください。";
@@ -57,7 +51,6 @@ public class AccountValidator {
     }
 
     public static String validateName(String name) {
-        // 空白だけの入力も「未入力」として扱う
         if (name == null || name.trim().isEmpty()) {
             return "名前を入力してください。";
         }
@@ -140,8 +133,6 @@ public class AccountValidator {
         return null;
     }
 
-    // 画像の「中身」が、本当に JPEG / PNG / GIF かを、ファイルの先頭の数バイトで確認する。
-    // （拡張子だけを変えた、画像でないファイルを、ブラウザ側のチェックに頼らず、Java側で防ぐ）
     public static String validateImageContent(byte[] head) {
         String message = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
         if (head == null || head.length < 6) {

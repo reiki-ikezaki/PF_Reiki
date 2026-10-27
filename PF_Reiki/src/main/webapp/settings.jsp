@@ -134,9 +134,7 @@
     <button type="submit">ログアウト</button>
 </form>
 
-
 <%
-    // ログイン中のユーザー（管理者か一般かで、名前の欄を出し分ける）
     UserData me = (UserData) session.getAttribute("user");
     boolean isAdmin = me != null && "admin".equals(me.getRole());
 %>
@@ -152,7 +150,6 @@
 %><div><%= HtmlUtil.escape(m) %></div><% } } %></div>
         <div class="msg success">${success}</div>
 
-
         <label>メールアドレス</label>
         <input type="text" name="email" value="<%= HtmlUtil.paramOr(request, "email", me.getEmail()) %>">
 
@@ -160,7 +157,6 @@
         <input type="password" name="password" placeholder="変更する場合のみ入力" autocomplete="new-password">
 
         <% if (isAdmin) { %>
-        <!-- 名前の変更は、管理者の設定画面だけ（一般ユーザーは「プロフィール」画面で変更する） -->
         <label>名前</label>
         <input type="text" name="name" value="<%= HtmlUtil.paramOr(request, "name", me.getName()) %>">
         <% } %>

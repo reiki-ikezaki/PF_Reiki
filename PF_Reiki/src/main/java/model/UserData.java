@@ -9,7 +9,7 @@ public class UserData {
     private String name;
     private String role;
     private String status;
-    private boolean hasImage;   // プロフィール画像が登録されているか（画像そのものは、持たない）
+    private boolean hasImage;
     private String bio;
     private int age;
     private String gender;

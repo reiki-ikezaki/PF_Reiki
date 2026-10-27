@@ -57,7 +57,6 @@ public class AccountDetailServlet extends HttpServlet {
         } else if (loggedIn && "general-list".equals(from)) {
             backUrl = "generalList";
         } else if ("public_ranking".equals(from)) {
-            // 公開の「月のいいねランキング」から来たときは、ログインの有無に関係なく、そこへ戻る
             backUrl = "public_ranking";
         } else {
             backUrl = "public_top";

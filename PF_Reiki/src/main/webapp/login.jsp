@@ -53,7 +53,6 @@
         font-size: 16px;
     }
 
-    /* ブラウザ標準の「目」「×」アイコンが右端に重なって表示崩れするのを抑止 */
     input::-ms-reveal,
     input::-ms-clear {
         display: none;

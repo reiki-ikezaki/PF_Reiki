@@ -199,7 +199,6 @@
             <td><%= HtmlUtil.formatDateTime(u.getCreatedAt()) %></td>
             <td><%= HtmlUtil.formatDateTime(u.getUpdatedAt()) %></td>
 
-            <!-- ★ 画像列（貼るだけで完成する強化版） -->
             <td>
                 <%
                     if (u.isHasImage()) {
@@ -215,7 +214,6 @@
                 %>
             </td>
 
-            <!-- ★ 操作列 -->
             <td>
                 <div class="actions">
                     <a href="editUser?id=<%= u.getId() %>" class="btn edit">編集</a>
@@ -239,7 +237,6 @@
     </table>
     </div>
 
-    <!-- ▼▼▼ ページネーション ▼▼▼ -->
     <div class="pagination" style="text-align:center; margin-top:20px;">
 
         <%
@@ -268,7 +265,6 @@
         <% } %>
 
     </div>
-    <!-- ▲▲▲ ページネーション ▲▲▲ -->
 
 </div>
 

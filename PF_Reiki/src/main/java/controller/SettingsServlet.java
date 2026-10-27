@@ -16,11 +16,6 @@ import model.UserData;
 import util.AccountValidator;
 import util.PasswordUtil;
 
-// 「設定」画面（ログイン中のユーザー本人）。URL: /settings
-//   管理者       … メールアドレス・パスワード・名前 を変更できる
-//   一般ユーザー … メールアドレス・パスワード を変更できる（名前などは「プロフィール」画面）
-//   GET  … 設定画面を表示
-//   POST … 入力を検証して更新
 @WebServlet("/settings")
 public class SettingsServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -41,10 +36,9 @@ public class SettingsServlet extends HttpServlet {
         boolean isAdmin = "admin".equals(user.getRole());
 
         String email = request.getParameter("email");
-        String password = request.getParameter("password");   // 空なら変更しない
-        String name = request.getParameter("name");           // 管理者だけが使う
+        String password = request.getParameter("password");
+        String name = request.getParameter("name");
 
-        // 検証：メールアドレス・パスワード（管理者は、名前も）。全項目を検査し、エラーをまとめて表示する。
         List<String> errors = new ArrayList<>();
         AccountValidator.addIfError(errors, AccountValidator.validateEmail(email));
         AccountValidator.addIfError(errors, AccountValidator.validatePassword(password));
@@ -67,7 +61,6 @@ public class SettingsServlet extends HttpServlet {
             return;
         }
 
-        // セッション内のユーザー情報にも反映する
         user.setEmail(email);
         if (password != null && !password.isEmpty()) {
             user.setPassword(PasswordUtil.hash(password));

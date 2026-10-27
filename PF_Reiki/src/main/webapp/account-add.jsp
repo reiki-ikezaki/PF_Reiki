@@ -117,7 +117,6 @@ function toggleRole() {
     const userFields = document.getElementById("userFields");
     userFields.style.display = isAdmin ? "none" : "block";
 
-    // 管理者のときは、一般項目を送信しない（disabled の入力欄は、送信されない）
     userFields.querySelectorAll("input, select, textarea").forEach(function (el) {
         el.disabled = isAdmin;
     });
@@ -137,7 +136,6 @@ function toggleRole() {
 %><div><%= HtmlUtil.escape(m) %></div><% } } %></div>
 
 <%
-    // エラーで戻ってきたとき、入力内容を消さないために、送信された値を取り出す
     String fRole   = request.getParameter("role")   != null ? request.getParameter("role")   : "user";
     String fStatus = request.getParameter("status") != null ? request.getParameter("status") : "active";
     String fGender = request.getParameter("gender") != null ? request.getParameter("gender") : "male";
@@ -145,7 +143,6 @@ function toggleRole() {
 
 <form action="/PF_Reiki/CreateUserServlet" method="post" enctype="multipart/form-data">
 
-    <!-- ▼ ユーザー種別 -->
     <div class="vertical">
         <label>ユーザー種別</label>
         <div class="radio-group">
@@ -160,7 +157,6 @@ function toggleRole() {
         </div>
     </div>
 
-    <!-- ▼ ステータス -->
     <div class="vertical">
         <label>ステータス</label>
         <div class="radio-group">
@@ -169,7 +165,6 @@ function toggleRole() {
         </div>
     </div>
 
-    <!-- ▼ 共通項目（管理者・一般どちらも必須）：ユーザー名・メール・名前・パスワード -->
     <div class="vertical">
 
         <label>ユーザー名</label>
@@ -186,7 +181,6 @@ function toggleRole() {
 
     </div>
 
-    <!-- ▼ 一般ユーザー項目（管理者を選ぶと非表示になり、送信もされない） -->
     <div id="userFields" class="vertical">
 
         <label>プロフィール画像（jpg / jpeg / png / gif・2MB以下）</label>
@@ -210,7 +204,6 @@ function toggleRole() {
 
     </div>
 
-    <!-- ▼ 管理者項目（共通項目のみ。追加の入力欄は無い） -->
     <div id="adminFields" class="vertical" style="display:none;">
     </div>
 
@@ -224,13 +217,10 @@ function toggleRole() {
 </div>
 
 <script>
-    // 初期表示時に role に応じて切り替え
     toggleRole();
 </script>
 
 <script>
-    // 画像を選んだ時点で、すぐに知らせる（拡張子・2MB）。表示場所は、他の入力エラーと同じ欄。
-    // ※ 最終的な判定は、保存時に、Java（AccountValidator）で必ず行う。
     document.querySelector("input[name='profileImage']").addEventListener("change", function (e) {
         var file = e.target.files[0];
         var errorBox = document.querySelector(".msg");
@@ -239,14 +229,14 @@ function toggleRole() {
         var ext = file.name.split(".").pop().toLowerCase();
         if (["jpg", "jpeg", "png", "gif"].indexOf(ext) === -1) {
             errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
-            e.target.value = "";   // 選択を解除する
-            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            e.target.value = "";
+            errorBox.scrollIntoView({ block: "center" });
             return;
         }
         if (file.size > 2 * 1024 * 1024) {
             errorBox.textContent = "プロフィール画像は2MB以下にしてください。";
-            e.target.value = "";   // 選択を解除する
-            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            e.target.value = "";
+            errorBox.scrollIntoView({ block: "center" });
             return;
         }
         errorBox.textContent = "";

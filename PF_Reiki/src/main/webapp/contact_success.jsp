@@ -1,5 +1,4 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
-<%-- お問い合わせ送信完了画面。ContactStatusServlet#doPost のリダイレクト先。表示のみ（処理なし） --%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -52,7 +51,6 @@
     <h2>お問い合わせ<br>ありがとうございました</h2>
     <p>担当者が確認いたします。</p>
 
-    <!-- ★ ログイン画面へ戻る -->
     <a class="btn" href="login.jsp">ログイン画面へ戻る</a>
 </div>
 

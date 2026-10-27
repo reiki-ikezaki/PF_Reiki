@@ -36,7 +36,6 @@ public class CategoryEditServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         String name = request.getParameter("name");
 
-        // 空白だけの入力も「未入力」として扱う
         if (name == null || name.trim().isEmpty() || name.length() > 255) {
             request.setAttribute("error", "カテゴリ名は1〜255文字で入力してください");
 
@@ -49,7 +48,6 @@ public class CategoryEditServlet extends HttpServlet {
             return;
         }
 
-        // 更新に失敗したとき（DB側の列の長さが足りない場合など）は、エラーを表示して、入力内容を残す
         CategoryDao dao = new CategoryDao();
         if (!dao.update(id, name)) {
             request.setAttribute("error", "更新に失敗しました。");

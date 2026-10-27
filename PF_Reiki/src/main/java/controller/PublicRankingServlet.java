@@ -13,8 +13,6 @@ import jakarta.servlet.http.HttpSession;
 import dao.UserDao;
 import model.UserData;
 
-// 公開画面「月のいいねランキング一覧」。URL: /public_ranking（ログイン不要）
-// 一般ユーザーを、今月のいいね数が多い順に、一覧で表示する（公開トップと同じカード表示）。
 @WebServlet("/public_ranking")
 public class PublicRankingServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
@@ -25,8 +23,6 @@ public class PublicRankingServlet extends HttpServlet {
         UserDao userDao = new UserDao();
         List<UserData> rankingUsers = userDao.getGeneralUserRankingThisMonth();
 
-        // ?format=json のときは、順位の最新情報（id といいね数）だけをJSONで返す。
-        // 画面の JavaScript が、定期的にこれを取りに行って、並び順を自動で更新する。
         if ("json".equals(request.getParameter("format"))) {
             writeRankingJson(response, rankingUsers);
             return;
@@ -34,7 +30,6 @@ public class PublicRankingServlet extends HttpServlet {
 
         request.setAttribute("rankingUsers", rankingUsers);
 
-        // ログイン状態に応じて、右上のボタンを出し分ける（公開トップと同じ）
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute("userId") != null) {
             UserData loginUser = (UserData) session.getAttribute("loginUser");
@@ -47,7 +42,6 @@ public class PublicRankingServlet extends HttpServlet {
         request.getRequestDispatcher("public_ranking.jsp").forward(request, response);
     }
 
-    // 例：[{"id":3,"likeCount":5},{"id":2,"likeCount":2}]（いいねが多い順）
     private void writeRankingJson(HttpServletResponse response, List<UserData> users)
             throws IOException {
 

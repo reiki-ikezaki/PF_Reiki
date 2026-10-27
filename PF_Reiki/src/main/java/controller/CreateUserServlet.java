@@ -17,10 +17,6 @@ import dao.UserDao;
 import model.UserData;
 import util.AccountValidator;
 
-// アカウント追加（管理者用）。URL: /CreateUserServlet（POST）
-//   管理者項目 … ユーザー名・メール・名前・パスワード・ステータス
-//   一般項目   … 上記 ＋ プロフィール画像・ふりがな・性別・年齢・自己紹介
-// ユーザー種別（role）に応じて、検証する項目と保存する項目を切り替える。
 @WebServlet("/CreateUserServlet")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class CreateUserServlet extends HttpServlet {
@@ -28,14 +24,12 @@ public class CreateUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 日本語（名前・ふりがななど）が文字化けしないよう、先にUTF-8を指定する
         request.setCharacterEncoding("UTF-8");
 
         Part filePart = null;
         try {
             filePart = request.getPart("profileImage");
         } catch (Exception e) {
-            // 10MBを超える画像など、受け取り自体に失敗した場合
             getServletContext().log("[アカウント追加] フォームの受け取りに失敗", e);
             showError(request, response, "プロフィール画像は2MB以下にしてください。");
             return;
@@ -50,11 +44,6 @@ public class CreateUserServlet extends HttpServlet {
 
         boolean isAdmin = "admin".equals(role);
 
-        // 検証は、画面の上から下の並び順で、全項目を行い、エラーをまとめて表示する。
-        //   画面の並び：ユーザー種別 → ステータス → ユーザー名 → メール → 名前 → パスワード
-        //               →（一般のみ）画像 → ふりがな → 性別 → 年齢 → 自己紹介
-
-        // ① 共通項目の検証（管理者・一般 どちらでも必要）
         List<String> errors = new ArrayList<>();
         AccountValidator.addIfError(errors, AccountValidator.validateRole(role));
         AccountValidator.addIfError(errors, AccountValidator.validateStatus(status));
@@ -71,7 +60,6 @@ public class CreateUserServlet extends HttpServlet {
             AccountValidator.addIfError(errors, AccountValidator.validatePassword(password));
         }
 
-        // ② 一般項目の検証（一般ユーザーを追加するときだけ）
         String furigana = null;
         String gender = null;
         String ageStr = null;
@@ -89,7 +77,6 @@ public class CreateUserServlet extends HttpServlet {
                     imageError = AccountValidator.validateImageSize(filePart.getSize());
                 }
                 if (imageError == null) {
-                    // 拡張子だけでなく、中身も画像か、Java側で確認する
                     try (InputStream in = filePart.getInputStream()) {
                         imageError = AccountValidator.validateImageContent(in.readNBytes(8));
                     }
@@ -107,7 +94,6 @@ public class CreateUserServlet extends HttpServlet {
             return;
         }
 
-        // ③ 保存する（管理者には、一般項目を保存しない）
         InputStream img = null;
         int age = 0;
 
@@ -142,9 +128,6 @@ public class CreateUserServlet extends HttpServlet {
         }
     }
 
-    // エラーメッセージを付けて、追加画面へ戻す。
-    // 送信された値はリクエストのパラメータに残っているので、画面側（account-add.jsp）が
-    // それを入力欄に戻す（入力内容が消えない）。
     private void showError(HttpServletRequest request, HttpServletResponse response, String message)
             throws ServletException, IOException {
         showError(request, response, List.of(message));
@@ -152,7 +135,6 @@ public class CreateUserServlet extends HttpServlet {
 
     private void showError(HttpServletRequest request, HttpServletResponse response, List<String> errors)
             throws ServletException, IOException {
-        // 原因調査用のログ（入力値そのものは出さず、届いた項目名だけを記録する）
         getServletContext().log("[アカウント追加] エラー: " + errors
                 + " / Content-Type=" + request.getContentType()
                 + " / 届いた項目=" + request.getParameterMap().keySet());

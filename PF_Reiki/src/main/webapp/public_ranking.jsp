@@ -17,7 +17,6 @@
 <title>月のいいねランキング</title>
 
 <style>
-    /* 公開トップ（public_top.jsp）と同じ見た目にそろえている */
     * { box-sizing: border-box; }
     body { font-family: Arial; background: #f5f5f5; padding: 20px; margin: 0; }
     .box { background: white; padding: 20px; border-radius: 8px; width: 800px; max-width: 100%; margin: 60px auto 20px; }
@@ -95,7 +94,6 @@
 </style>
 
 <script>
-// 「いいね」ボタン：この画面の中で、非同期（画面を再読み込みせず）にいいねを付けて、数だけ更新する
 async function sendLike(btn, targetUserId) {
     btn.disabled = true;
     try {
@@ -116,7 +114,6 @@ async function sendLike(btn, targetUserId) {
         const countEl = document.getElementById("likeCount-" + targetUserId);
         if (countEl) countEl.textContent = data.likeCount;
 
-        // いいねを押したら、すぐに、いいね順へ並び替える
         refreshRanking();
 
     } catch (e) {
@@ -124,7 +121,6 @@ async function sendLike(btn, targetUserId) {
     }
 }
 
-// 最新の順位をサーバーから取得して、カードを「いいねが多い順」に並び替える（画面は再読み込みしない）
 async function refreshRanking() {
     try {
         const res = await fetch("public_ranking?format=json", { cache: "no-store" });
@@ -137,7 +133,6 @@ async function refreshRanking() {
             cards[card.dataset.userId] = card;
         });
 
-        // ユーザーが増えた・減った場合は、画面を読み込み直す
         if (list.length !== Object.keys(cards).length || list.some(function (u) { return !cards[u.id]; })) {
             location.reload();
             return;
@@ -147,19 +142,16 @@ async function refreshRanking() {
             const card = cards[u.id];
             card.querySelector(".rank").textContent = (i + 1) + " 位";
             card.querySelector(".like-count").textContent = u.likeCount;
-            container.appendChild(card);   // 順番に、末尾へ移す ＝ 並び替え
+            container.appendChild(card);
         });
     } catch (e) {
-        // 通信エラーのときは、何もしない（次の更新で、取り直す）
     }
 }
 
-// ほかの画面・ほかの人のいいねも反映するため、一定時間ごとに自動で更新する
 setInterval(function () {
     if (!document.hidden) refreshRanking();
 }, 5000);
 
-// 別のタブから戻ってきたときも、すぐに更新する
 document.addEventListener("visibilitychange", function () {
     if (!document.hidden) refreshRanking();
 });
@@ -168,7 +160,6 @@ document.addEventListener("visibilitychange", function () {
 </head>
 <body>
 
-<!-- 右上：ログイン状態に応じて出し分け -->
 <% if (loggedIn) { %>
     <div class="header-actions">
         <a href="<%= dashboardUrl %>" class="login-btn">マイページに戻る</a>

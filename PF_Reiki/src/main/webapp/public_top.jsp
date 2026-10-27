@@ -116,7 +116,6 @@ async function sendLike(btn, targetUserId) {
 </head>
 <body>
 
-<!-- 右上：ログイン状態に応じて出し分け -->
 <% if (loggedIn) { %>
     <div class="header-actions">
         <a href="<%= dashboardUrl %>" class="login-btn">マイページに戻る</a>
@@ -142,7 +141,6 @@ async function sendLike(btn, targetUserId) {
             <p><b>性別:</b> <%= HtmlUtil.genderLabel(u.getGender()) %></p>
             <p><b>年齢:</b> <%= u.getAge() %></p>
 
-            <!-- ★ getProfile() → getBio() に修正済み -->
             <p><b>自己紹介:</b> <%= HtmlUtil.escapeAndBr(u.getBio()) %></p>
 
             <p><b>いいね数:</b> <span id="likeCount-<%= u.getId() %>"><%= u.getLikeCount() %></span></p>
@@ -153,7 +151,6 @@ async function sendLike(btn, targetUserId) {
         </div>
     <% } %>
 
-    <!-- 月のいいねランキングは、別の画面（public_ranking）にある -->
     <p style="margin-top:20px;">
         <a class="detail-link" style="margin-left:0;" href="public_ranking">月のいいねランキングを見る</a>
     </p>

@@ -8,7 +8,6 @@ import java.util.List;
 
 import model.Category;
 
-
 public class CategoryDao {
 
     public List<Category> findAll() {

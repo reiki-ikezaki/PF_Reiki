@@ -3,7 +3,6 @@
 <%@ page import="model.Category" %>
 <%@ page import="util.HtmlUtil" %>
 <%
-    // ContactStatusServlet#doGet がセットしたカテゴリ一覧を受け取る（プルダウン用）
     List<Category> categories = (List<Category>) request.getAttribute("categories");
 %>
 <!DOCTYPE html>
@@ -102,12 +101,10 @@
 <div class="box">
     <h2>お問い合わせ</h2>
 
-    <!-- 送信先は POST /contact（＝ContactStatusServlet#doPost） -->
     <form action="contact" method="post">
 
         <div class="form-group">
             <label>カテゴリ</label>
-            <!-- カテゴリをDBの値で1件ずつ<option>にする。value は category_id -->
             <select name="category_id" required>
                 <%
                     if (categories != null) {
@@ -123,12 +120,12 @@
 
         <div class="form-group">
             <label>メッセージ</label>
-            <textarea name="content" rows="5"></textarea> <!-- 問い合わせ本文 -->
+            <textarea name="content" rows="5"></textarea>
         </div>
 
         <div class="form-group">
             <label>メールアドレス</label>
-            <input type="email" name="email"> <!-- 返信先。メール本文にも載る -->
+            <input type="email" name="email">
         </div>
 
         <button type="submit">送信</button>

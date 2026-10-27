@@ -19,10 +19,6 @@ import dao.UserDao;
 import model.UserData;
 import util.AccountValidator;
 
-// 一般ユーザーの「自己紹介編集（プロフィール）」画面の処理。URL: /profileEdit（POST）
-//   編集できる項目：プロフィール画像・名前・ふりがな・性別・年齢・自己紹介
-//   （メールアドレス・パスワードは「設定」画面 /settings で変更する）
-//   管理者にはプロフィールが無いので、管理者が来たら「設定」画面へ移す。
 @WebServlet("/profileEdit")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class ProfileEditServlet extends HttpServlet {
@@ -47,10 +43,6 @@ public class ProfileEditServlet extends HttpServlet {
         String ageStr = request.getParameter("age");
         String bio = request.getParameter("bio");
 
-        // 検証は、画面の上から下の並び順で、全項目を行い、エラーをまとめて表示する。
-        //   画面の並び：プロフィール画像 → 名前 → ふりがな → 性別 → 年齢 → 自己紹介
-
-        // ① プロフィール画像の検証（選択されたときだけ）
         List<String> errors = new ArrayList<>();
         String imageError = null;
         byte[] imageBytes = null;
@@ -72,7 +64,6 @@ public class ProfileEditServlet extends HttpServlet {
                         }
                         imageBytes = out.toByteArray();
                     }
-                    // 拡張子だけでなく、中身も画像か、Java側で確認する
                     imageError = AccountValidator.validateImageContent(imageBytes);
                 }
             }
@@ -82,7 +73,6 @@ public class ProfileEditServlet extends HttpServlet {
         }
         AccountValidator.addIfError(errors, imageError);
 
-        // ② 名前・ふりがな・性別・年齢・自己紹介の検証
         AccountValidator.addIfError(errors, AccountValidator.validateName(name));
         AccountValidator.addIfError(errors, AccountValidator.validateFurigana(furigana));
         AccountValidator.addIfError(errors, AccountValidator.validateGender(gender));
@@ -99,7 +89,6 @@ public class ProfileEditServlet extends HttpServlet {
             age = Integer.parseInt(ageStr);
         }
 
-        // ③ 更新
         UserDao dao = new UserDao();
         boolean updated = dao.updateProfile(user.getId(), name, furigana, gender, age, bio, imageBytes);
 
@@ -108,7 +97,6 @@ public class ProfileEditServlet extends HttpServlet {
             return;
         }
 
-        // セッション内のユーザー情報にも反映する
         user.setName(name);
         user.setFurigana(furigana);
         user.setGender(gender);

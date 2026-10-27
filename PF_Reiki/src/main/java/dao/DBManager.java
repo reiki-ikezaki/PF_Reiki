@@ -5,8 +5,6 @@ import java.sql.DriverManager;
 
 public class DBManager {
 
-    // 接続先はまず環境変数を見る（Docker用）。無ければローカル開発用のデフォルト値を使うので、
-    // Eclipse上でそのまま実行していた今までの動作は変わらない。
     private static final String HOST     = env("DB_HOST", "localhost");
     private static final String PORT     = env("DB_PORT", "3306");
     private static final String DB_NAME  = env("DB_NAME", "myapp_db");

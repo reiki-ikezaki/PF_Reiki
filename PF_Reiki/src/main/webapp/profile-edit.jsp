@@ -4,7 +4,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="util.HtmlUtil" %>
 <%
-    // 管理者にはプロフィールが無いので、「設定」画面へ移す
     UserData guardUser = (UserData) session.getAttribute("user");
     if (guardUser != null && "admin".equals(guardUser.getRole())) {
         response.sendRedirect("settings");
@@ -142,12 +141,9 @@
     <button type="submit">ログアウト</button>
 </form>
 
-
 <%
-    // ログイン中のユーザー（一般ユーザーのプロフィール）
     UserData me = (UserData) session.getAttribute("user");
 
-    // エラーで戻ってきたときは、送信された値を表示する（入力内容を消さない）
     String fGender = HtmlUtil.paramOr(request, "gender", me.getGender());
     if (fGender.isEmpty()) { fGender = "male"; }
 %>
@@ -162,7 +158,6 @@
     if (errs != null) { for (String m : errs) {
 %><div><%= HtmlUtil.escape(m) %></div><% } } %></div>
         <div class="msg success">${success}</div>
-
 
         <label>プロフィール画像（jpg/png/gif・2MB以下）</label><br>
         <% if (me.isHasImage()) { %>
@@ -201,8 +196,6 @@
 </div>
 
 <script>
-    // 画像を選んだ時点で、すぐに知らせる（拡張子・2MB）。表示場所は、他の入力エラーと同じ欄。
-    // ※ 最終的な判定は、保存時に、Java（AccountValidator）で必ず行う。
     document.querySelector("input[name='profileImage']").addEventListener("change", function (e) {
         var file = e.target.files[0];
         var errorBox = document.querySelector(".msg.error");
@@ -211,14 +204,14 @@
         var ext = file.name.split(".").pop().toLowerCase();
         if (["jpg", "jpeg", "png", "gif"].indexOf(ext) === -1) {
             errorBox.textContent = "正しい画像ファイル（jpg / jpeg / png / gif）を選択してください。";
-            e.target.value = "";   // 選択を解除する
-            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            e.target.value = "";
+            errorBox.scrollIntoView({ block: "center" });
             return;
         }
         if (file.size > 2 * 1024 * 1024) {
             errorBox.textContent = "プロフィール画像は2MB以下にしてください。";
-            e.target.value = "";   // 選択を解除する
-            errorBox.scrollIntoView({ block: "center" });   // エラー欄が見える位置まで移動する
+            e.target.value = "";
+            errorBox.scrollIntoView({ block: "center" });
             return;
         }
         errorBox.textContent = "";

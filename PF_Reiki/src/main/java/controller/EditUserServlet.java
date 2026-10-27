@@ -18,9 +18,6 @@ import dao.UserDao;
 import model.UserData;
 import util.AccountValidator;
 
-// アカウント編集（管理者用）。URL: /editUser
-//   GET  … 編集画面を表示
-//   POST … 入力を検証して更新（ユーザー種別に応じて、検証・保存する項目を切り替える）
 @WebServlet("/editUser")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 10)
 public class EditUserServlet extends HttpServlet {
@@ -37,10 +34,8 @@ public class EditUserServlet extends HttpServlet {
             UserDao dao = new UserDao();
             UserData user = dao.findById(userId);
 
-
             request.setAttribute("user", user);
         }
-
 
         request.getRequestDispatcher("edit-account.jsp").forward(request, response);
     }
@@ -48,7 +43,6 @@ public class EditUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 日本語が文字化けしないよう、先にUTF-8を指定する
         request.setCharacterEncoding("UTF-8");
 
         int id = Integer.parseInt(request.getParameter("id"));
@@ -72,18 +66,11 @@ public class EditUserServlet extends HttpServlet {
 
         boolean isAdmin = "admin".equals(role);
 
-        // 検証は、画面の上から下の並び順で、全項目を行い、エラーをまとめて表示する。
-        //   画面の並び：ユーザー種別 → ステータス → ユーザー名 → メール → 名前 → パスワード
-        //               →（一般のみ）画像 → ふりがな → 性別 → 年齢 → 自己紹介
-
-        // ① 共通項目の検証（パスワードは「変更する場合のみ」入力。空なら変更しない）
         List<String> errors = new ArrayList<>();
         AccountValidator.addIfError(errors, AccountValidator.validateRole(role));
         AccountValidator.addIfError(errors, AccountValidator.validateStatus(status));
         String usernameError = AccountValidator.validateUsername(username);
         AccountValidator.addIfError(errors, usernameError);
-        // ユーザー名を「変更したとき」だけ、重複を確認する
-        // （すでに重複しているデータがあっても、ユーザー名を変えない編集は、できるようにする）
         UserData current = dao.findById(id);
         boolean usernameChanged = current == null || username == null || !username.equals(current.getUsername());
         if (usernameError == null && usernameChanged && dao.existsUsername(username, id)) {
@@ -93,7 +80,6 @@ public class EditUserServlet extends HttpServlet {
         AccountValidator.addIfError(errors, AccountValidator.validateName(name));
         AccountValidator.addIfError(errors, AccountValidator.validatePassword(password));
 
-        // ② 一般項目の検証（一般ユーザーのときだけ）
         String furigana = null;
         String gender = null;
         String ageStr = null;
@@ -111,7 +97,6 @@ public class EditUserServlet extends HttpServlet {
                     imageError = AccountValidator.validateImageSize(filePart.getSize());
                 }
                 if (imageError == null) {
-                    // 拡張子だけでなく、中身も画像か、Java側で確認する
                     try (InputStream in = filePart.getInputStream()) {
                         imageError = AccountValidator.validateImageContent(in.readNBytes(8));
                     }
@@ -129,7 +114,6 @@ public class EditUserServlet extends HttpServlet {
             return;
         }
 
-        // ③ 保存する（管理者には、一般項目を保存しない）
         byte[] imageBytes = null;
         int age = 0;
 
@@ -171,9 +155,6 @@ public class EditUserServlet extends HttpServlet {
         }
     }
 
-    // エラーメッセージを付けて、編集画面へ戻す。
-    // 送信された値はリクエストのパラメータに残っているので、画面側（edit-account.jsp）が
-    // それを入力欄に戻す（入力内容が消えない）。パラメータが無い項目は、DBの値を表示する。
     private void showError(HttpServletRequest request, HttpServletResponse response,
             UserDao dao, int id, String message) throws ServletException, IOException {
         showError(request, response, dao, id, List.of(message));
@@ -181,7 +162,6 @@ public class EditUserServlet extends HttpServlet {
 
     private void showError(HttpServletRequest request, HttpServletResponse response,
             UserDao dao, int id, List<String> errors) throws ServletException, IOException {
-        // 原因調査用のログ（入力値そのものは出さず、届いた項目名だけを記録する）
         getServletContext().log("[アカウント編集] エラー: " + errors
                 + " / Content-Type=" + request.getContentType()
                 + " / 届いた項目=" + request.getParameterMap().keySet());

@@ -79,9 +79,6 @@ public class UserDao {
         }
     }
 
-    // 一般ユーザーの「自己紹介編集（プロフィール）」用：
-    //   名前・ふりがな・性別・年齢・自己紹介（と、選択されたときだけプロフィール画像）を更新する。
-    //   メールアドレス・パスワードは「設定」画面の担当なので、ここでは触らない。
     public boolean updateProfile(int id, String name, String furigana, String gender,
             int age, String bio, byte[] imageBytes) {
 
@@ -116,7 +113,6 @@ public class UserDao {
         return false;
     }
 
-    // 一般ユーザーの「設定」用：メールアドレスと（入力されたときだけ）パスワードを更新する。
     public boolean updateEmailAndPassword(int id, String email, String password) {
 
         boolean changePassword = password != null && !password.isEmpty();
@@ -149,8 +145,6 @@ public class UserDao {
     public boolean updateAccount(UserData user, String password, byte[] imageBytes) {
         boolean changePassword = password != null && !password.isEmpty();
 
-        // 管理者には一般項目（ふりがな・性別・年齢・自己紹介・画像）がない。
-        // 管理者として保存するときは、画像も一緒に消す（他の項目と同じ扱いにする）。
         boolean isAdmin = "admin".equals(user.getRole());
 
         StringBuilder sql = new StringBuilder(
@@ -364,7 +358,6 @@ public class UserDao {
         return false;
     }
 
-
     public byte[] getProfileImageBytes(int id) {
         String sql = "SELECT profile_image FROM users WHERE id = ?";
 
@@ -489,8 +482,6 @@ public class UserDao {
         return list;
     }
 
-    // 公開の「月のいいねランキング」用：一般ユーザーを「今月のいいね数が多い順」で返す。
-    // 公開一覧（getGeneralUserList）と同じ項目を持つので、同じカード表示ができる。
     public List<UserData> getGeneralUserRankingThisMonth() {
 
         List<UserData> list = new ArrayList<>();
@@ -530,7 +521,6 @@ public class UserDao {
         return list;
     }
 
-    // ユーザー名が既に使われているか（excludeId のユーザー自身は除く。追加時は 0 を渡す）
     public boolean existsUsername(String username, int excludeId) {
         String sql = "SELECT COUNT(*) FROM users WHERE username = ? AND id != ?";
 
@@ -552,8 +542,6 @@ public class UserDao {
         return false;
     }
 
-    // 管理者の「アカウント設定」用：メールアドレス・パスワード・名前だけを更新する。
-    // （ふりがな・性別・年齢・自己紹介・画像は、管理者には無い項目なので触らない）
     public boolean updateAdminSettings(int id, String email, String password, String name) {
 
         boolean changePassword = password != null && !password.isEmpty();

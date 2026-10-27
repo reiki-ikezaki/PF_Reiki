@@ -140,9 +140,7 @@
     </div>
 
     <div class="menu">
-        <!-- ★ 設定画面（メールアドレス・パスワード）へ遷移 -->
         <a href="settings">設定</a>
-        <!-- ★ 自己紹介編集画面（プロフィール）へ遷移 -->
         <a href="profile-edit.jsp">プロフィール</a>
     </div>
 </div>
